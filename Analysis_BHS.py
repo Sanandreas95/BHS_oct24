@@ -4,13 +4,13 @@ import pandas as pd
 import numpy as np
 from openpyxl.styles import Alignment
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\6.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\8.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\2148Analysis_BHS24oct.xlsx'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\1635MaldaAnalysis_BHS26oct.xlsx'
 
 df = pd.read_excel(input_file,input_sheet)
 df=df[df['Q2'] == 1]
-
+# df=df[df['A_Segment_3']==1]
 
 
 
@@ -27,7 +27,7 @@ df=df[df['Q2'] == 1]
 
 
 # Step 1: Create a list of topic names
-topics = ['Table1 :Combined table of Counts for total awareness and Total usage','Table2:Shifting from previous to current regular brand','Table 3 : Count:Age wise brands','Table4 : Count:SEC wise brands']
+topics = ['Table1 :Combined table of Counts for total awareness and Total usage','Table2:Shifting from previous to current regular brand','Table 3 : Count:Age wise brands','Table4 : Count:SEC wise brands','Count:Price quoted for MOUB']
 
 
 df_name = pd.DataFrame(topics, columns=['Logic list'])
@@ -713,8 +713,132 @@ crosstab_result = pd.crosstab(df_modified['Age'], df_modified['Q21'])
 # dynamic_headers = [f'brands{i}' for i in range(1, len(crosstab_result.columns) + 1)]
 
 count1=pd.DataFrame(crosstab_result )
+count1=pd.DataFrame(crosstab_result )
+count1['Total']=count1.sum(min_count=1,axis=1)
+
+
+total=count1.sum()
+# total.name='Total'
+# count1=count1._append(total)
+count1.loc['Total']=total
+
 
 inside_append_dataframe_with_blank_rows(output_path, count1)
+
+
+
+
+
+
+
+
+
+
+
+# Count:SEC wise brands
+
+
+Error_n = ['Count6:SEC wise brands']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+df_global=df.copy()
+
+input_string1=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101]
+string="American Club ,Cavanders Gold Rich Taste ,Chancellor ,Charminar Filter ,Charms Special Blue ,Classic ,Editions Trio ,Flake Special Filter ,Focus Mint  ,Gold Flake Kings ,Gold Flake Premium ,Gold Flake Premium Neo Smart ,Gold Flake Indie Mint ,Gold Flake Special ,Gold Flake Special Mint ,Gold Flake Super Star ,India King ,Marlboro KSFT ,Marlboro Advance Compact ,Marlboro Pocket Filter ,Navy Cut Fruit ,Navy Cut Virginia Filter ,Red & White Select ,Red & White Select,Regent ,Regent Black ,Regent Cool ,Silk Cut Blue ,Silk Cut Filter ,Silk Cut Virginia ,Special Blues ,Special Red Longs ,Special Red Signature ,Stellar Cool Blast  ,T3 White  ,Total Refresh ,Total Royal Twist ,Total Spearmint ,Wave Cool Mint ,Wills Navy Cut Filter ,Wills Navy Cut,American Club Mint ,American Club Smash ,American Fruit ,Benson & Hedges  ,Berkeley ,Berkely ,Blue Charms ,Blue Charms ,Bristol ,Cavander Gold  ,Chancellor ,Charminar Plains ,Charms Regular Filter ,Classic Connect ,Classic Ice Burst ,Club One ,Duke ,Editions Active Mint ,Editions Ice Fruit ,Editions Spark ,Flake Excel ,Flake Liberty ,Flake Mint Switch ,Flake Nova ,Flake White ,Gold Flake Century ,Gold Flake Filter ,Gold Flake Filter ,Gold Flake Kings ,Gold Flake Kings Lights ,Gold Flake Kings SLK ,Golden Gold Flake ,Kingston ,Marlboro Clove ,Marlboro Fuse Beyond ,NATIONAL GOLD FLAKE ,Navy Cut Deluxe Filter ,Originals ,Panama ,Panama Filter ,Panama Filter ,Player's Fruit ,Player's Mint ,Royal ,Scissors Menthol  ,Classic ,Stellar Slims Define ,Stellar Slims Shift ,Total Active Mint ,Wave Fruity ,Wave Mint ,Will Flake Premium Filter ,Zaffran ,American Club Clove Magik ,Classic AlphaTec ,Classic Double Burst ,Classic Verve ,Stellar Define Pan ,Stellar Shift Duos ,Wills Insignia "
+input_string2 = string.split(',')  
+# Remove leading and trailing spaces from each item
+input_string2 = [item.strip() for item in input_string2]
+dictionary = dict(zip(input_string1, input_string2))
+df_global['Q21'] = df_global['Q21'].replace(dictionary)
+
+input_string1=[1,2,3,4]
+input_string2=['SEC A','SEC B','SEC C','SEC D']
+dictionary = dict(zip(input_string1, input_string2))
+df_global['SEC_Q'] = df_global['SEC_Q'].replace(dictionary)
+
+
+df_modified = df_global.loc[:,['SEC_Q','Q21']]
+crosstab_result = pd.crosstab(df_modified['SEC_Q'], df_modified['Q21'])
+count1=pd.DataFrame(crosstab_result )
+count1['Total']=count1.sum(min_count=1,axis=1)
+
+
+total=count1.sum()
+# total.name='Total'
+# count1=count1._append(total)
+count1.loc['Total']=total
+
+
+inside_append_dataframe_with_blank_rows(output_path, count1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Count:Price quoted for MOUB
+
+
+
+Error_n = ['Count:Price quoted for MOUB']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+df_global=df.copy()
+df_global = df_global.dropna(subset=['Q28'])
+df_global = df_global.dropna(subset=['Q29'])
+
+
+
+
+
+# MOUB brand naming
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global['Q21'] = df_global['Q21'].replace(dict_format)
+
+
+df_global1=df_global[df_global['Q28'] != -1]
+df_global2=df_global[df_global['Q29'] != -1]
+
+crosstab_result = pd.crosstab(df_global1['Q21'], df_global1['Q28'])
+crosstab_result1 = pd.crosstab(df_global2['Q21'], df_global2['Q29'])
+
+
+inside_append_dataframe_with_blank_rows(output_path, crosstab_result)
+
+inside_append_dataframe_with_blank_rows(output_path, crosstab_result1)
+
+
+
+
+
+
+
+
+
+
+
 
 
 
