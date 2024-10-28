@@ -4,12 +4,17 @@ import pandas as pd
 import numpy as np
 from openpyxl.styles import Alignment
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\8.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\11.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\1635MaldaAnalysis_BHS26oct.xlsx'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Analysis\11VijayavadaAnalysis_BHS.xlsx'
 
 df = pd.read_excel(input_file,input_sheet)
-df=df[df['Q2'] == 1]
+
+entries_to_exclude = ['test', 'trr','demo','test']
+df = df[~df['Interviewer'].isin(entries_to_exclude)]
+
+
+df=df[df['Q2'] == 5]
 # df=df[df['A_Segment_3']==1]
 
 
