@@ -5,13 +5,26 @@ import numpy as np
 from openpyxl.styles import Alignment
 
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\9.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\11.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\7Bilaspur_BHSerror.xlsx'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\11.Maldatotalerror_BHSerror.xlsx'
 
 df = pd.read_excel(input_file,input_sheet)
-df=df[df['Q2'] == 3]
+entries_to_exclude = ['test', 'trr','demo','test']
+df = df[~df['Interviewer'].isin(entries_to_exclude)]
 
+
+
+df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
+# df = df[df['Date'].dt.date == pd.Timestamp('2024-10-27').date()]
+
+
+
+df=df[df['Q2'] ==1]
+
+
+# For Random
+# df=df[df['A_Segment_1']==1]
 
 # For Booster
 # df=df[df['A_Segment_2']==1]
@@ -1345,7 +1358,7 @@ inside_append_dataframe_with_blank_rows(output_path, interviewererror)
 
 # Error19: Price fluctuation between alternate  & regular brand 
 
-Error_n = ['Error20: Price fluctuation between alternate  & regular brand ']
+Error_n = ['Error19: Price fluctuation between alternate  & regular brand ']
 df_name= pd.DataFrame(Error_n) 
 existing_df = pd.read_excel(output_path)
 startrow = existing_df.shape[0] + 4
@@ -2336,7 +2349,7 @@ with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='o
 
 
 df_global=df.copy()
-combined_brands = pd.concat([df_global['T_E1_BrandName_1_1'], df_global['T_E1_BrandName_1_2'], df_global['T_E1_BrandName_1_3']])
+combined_brands = pd.concat([df_global['T_E1_BrandName_1'], df_global['T_E1_BrandName_2'], df_global['T_E1_BrandName_3']])
 combined_brand_counts = combined_brands.value_counts()
 Valuecount=pd.DataFrame(combined_brand_counts)
 total_sum = Valuecount.sum()
@@ -2346,7 +2359,7 @@ Valuecount1=Valuecount._append(total_sum)
 
 
 # For brand frequency count interview wise
-interviewer_brand_counts = df.groupby('Interviewer')[['T_E1_BrandName_1_1', 'T_E1_BrandName_1_2', 'T_E1_BrandName_1_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
+interviewer_brand_counts = df.groupby('Interviewer')[['T_E1_BrandName_1', 'T_E1_BrandName_2', 'T_E1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
 total=interviewer_brand_counts.sum()
 total.name='Total'
 interviewer_brand_counts=interviewer_brand_counts._append(total)
