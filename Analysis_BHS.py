@@ -4,9 +4,9 @@ import pandas as pd
 import numpy as np
 from openpyxl.styles import Alignment
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\11.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\25.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Analysis\11VijayavadaAnalysis_BHS.xlsx'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Analysis\21Vizag_BHSanalysis.xlsx'
 
 df = pd.read_excel(input_file,input_sheet)
 
@@ -14,7 +14,14 @@ entries_to_exclude = ['test', 'trr','demo','test']
 df = df[~df['Interviewer'].isin(entries_to_exclude)]
 
 
-df=df[df['Q2'] == 5]
+ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099]
+df = df[~df['SbjNum'].isin(ID_to_exclude)]
+
+
+
+df=df[df['Q2'] == 4]
+# df=df[df['Q1_1']==1]
+
 # df=df[df['A_Segment_3']==1]
 
 
@@ -32,7 +39,7 @@ df=df[df['Q2'] == 5]
 
 
 # Step 1: Create a list of topic names
-topics = ['Table1 :Combined table of Counts for total awareness and Total usage','Table2:Shifting from previous to current regular brand','Table 3 : Count:Age wise brands','Table4 : Count:SEC wise brands','Count:Price quoted for MOUB']
+topics = ['Table1 :Combined table of Counts for total awareness and Total usage','Table2:Shifting from previous to current regular brand','Table 3 : Count:Age wise brands','Table4 : Count:SEC wise brands','Table5 :Count:Price quoted for MOUB']
 
 
 df_name = pd.DataFrame(topics, columns=['Logic list'])
@@ -69,7 +76,7 @@ def inside_append_dataframe_with_blank_rows(file_path, dataframe, blank_rows=2):
     worksheet = workbook.active
 
     # Center-align the text in the appended DataFrame
-    for row in worksheet.iter_rows(min_row=startrow + 1, max_row=startrow + len(dataframe) + 3, min_col=1, max_col=len(dataframe.columns) + 1):
+    for row in worksheet.iter_rows(min_row=startrow + 1, max_row=startrow + len(dataframe) + 5, min_col=1, max_col=len(dataframe.columns) + 1):
         for cell in row:
             cell.alignment = Alignment(horizontal='center', vertical='center')
 
@@ -239,6 +246,7 @@ df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October
 # Join two columns into a dictionary
 # Assuming 'Column1' and 'Column2' are the names of the columns you want to join
 dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
 df_global.rename(columns=dict_format, inplace=True)
 
 renamed_columns = list(dict_format.values())
@@ -640,7 +648,14 @@ df_global['Q24']=df_global['Q24'].replace(dict_format)
 
 
 shift_matrix = pd.crosstab(df_global['Q24'], df_global['Q21'])
+new_columns = pd.MultiIndex.from_product([['MOUB'], shift_matrix.columns])
 
+# Assign the new MultiIndex to the DataFrame
+shift_matrix.columns = new_columns
+
+
+# shift_matrix = shift_matrix.rename_axis('Q24', axis='index')
+# shift_matrix = shift_matrix.rename_axis('Q21', axis='columns')
 
 
 inside_append_dataframe_with_blank_rows(output_path, shift_matrix)
@@ -743,7 +758,7 @@ inside_append_dataframe_with_blank_rows(output_path, count1)
 # Count:SEC wise brands
 
 
-Error_n = ['Count6:SEC wise brands']
+Error_n = ['Table4 : Count:SEC wise brands']
 df_name= pd.DataFrame(Error_n) 
 existing_df = pd.read_excel(output_path)
 startrow = existing_df.shape[0] + 4
@@ -799,7 +814,7 @@ inside_append_dataframe_with_blank_rows(output_path, count1)
 
 
 
-Error_n = ['Count:Price quoted for MOUB']
+Error_n = ['Table5 :Count:Price quoted for MOUB']
 df_name= pd.DataFrame(Error_n) 
 existing_df = pd.read_excel(output_path)
 startrow = existing_df.shape[0] + 4
