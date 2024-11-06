@@ -3,24 +3,42 @@ from openpyxl import load_workbook
 import pandas as pd
 import numpy as np
 from openpyxl.styles import Alignment
+from openpyxl.styles import PatternFill
 
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\11.BHS.xlsx'
+
+
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\25.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\11.Maldatotalerror_BHSerror.xlsx'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\22.Vizag_BHSerror.xlsx'
 
 df = pd.read_excel(input_file,input_sheet)
+
+
+
+
+
+df=df[df['Q2'] ==4]
+# df=df[df['Q1_1']==1]
+
+df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
+# df = df[df['Date'].dt.date.isin([pd.Timestamp('2024-11-01').date(), pd.Timestamp('2024-11-02').date()])]
+
+df = df[df['Date'].dt.date == pd.Timestamp('2024-11-05').date()]
+
+
+
+
+
+
+ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099]
+df = df[~df['SbjNum'].isin(ID_to_exclude)]
+
 entries_to_exclude = ['test', 'trr','demo','test']
 df = df[~df['Interviewer'].isin(entries_to_exclude)]
 
 
 
-df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
-# df = df[df['Date'].dt.date == pd.Timestamp('2024-10-27').date()]
-
-
-
-df=df[df['Q2'] ==1]
 
 
 # For Random
@@ -49,10 +67,19 @@ df=df[df['Q2'] ==1]
 
 
 # Step 1: Create a list of topic names
-topics = ['Count1: Zone Quota', 'Count2: SEC count', 'Count3 : Age count', 'Count4 : MOUB count', 'Count5:Age wise brands', 'Count6:SEC wise brands','Count7:SEC wise smoking category','Error1: Time outside of 8:00-20:00', 'Error2: Age vs CWE', ' Error3:No. of categories coded for Q11 ','Error4:No. of sticks', 'Error5: Started smoking before 15 or after 25 years age ', ' Error6:frequency of number of brands selected  by each interviewer in spontaneous awareness(Q14)','Error7:Regular brand not in TOM ','Error8:Regular brand not in TOM  or spont','Error9: Frequency of number of brands selected  by each interviewer in aided awareness(Q15)','Error10: Frequency of number of brands selected  by each interviewer in ever smoked(Q16)','Error11: Frequency of number of brands selected  by each interviewer in ever smoked in last 2 years (Q17)','Error12: Frequency of number of brands selected  by each interviewer in ever smoked in last 1 year (Q18)','Error13: Frequency of number of brands selected  by each interviewer in ever smoked in last 1 month (Q19)','Error14 Frequency of number of brands selected  by each interviewer in ever smoked in last 2 weeks(Q20.1)','Error15: Frequency of number of brands selected  by each interviewer in ever smoked in last 1 week(Q20)','Error16: No. of sticksof regular brand (Q23)','Error17: Difference between avg sticks smoked/day & regular brand stick smoked/day','Error18: Price fluctuation between Previous  & regular brand ','Error19: Price fluctuation between alternate  & regular brand ','Error20:Price quoted for MOUB','Error21: Percentage of loose vs pack','Error22: Sticks, a pack consist of?',' Error23: Mild or strong? (Q31)',' Error24: Regualr brand is Mild or strong? (Q32)',' Error26: Number of times Statements being coded (C1)','  Error27: Statement selection (C2)',' Error28: Just Right scale (C3)',' Error30: Reasons to smoke regular brand (D1)',' Error: Awareness of Cig with Capsule (H1)',' Error: Capsule bursting (H5)',' Error: Reasons not regularly smoke a Capsule cigarette (H7)',' Error: Seen this PACKET of cigarette brand Blue Charms? (S3)',' Error: How much do you like the PACKET of this cigarette brand? (S4)','  Error: how much you agree or disagree with each of the statement (S5)','  Error: GPS data absent','']
+topics = ['Count1: Zone Quota', 'Count2: SEC count', 'Count3 : Age count', 'Count4 : MOUB count', 'Count5:Age wise brands', 'Count6:SEC wise brands','Count7:SEC wise smoking category','Error1: Time outside of 8:00-20:00', 'Error2: Age vs CWE', ' Error3:No. of categories coded for Q11 ','Error4:No. of sticks', 'Error5: Started smoking before 15 or after 25 years age ', ' Error6:frequency of number of brands selected  by each interviewer in spontaneous awareness(Q14)','Error7:Regular brand not in TOM ','Error8:Regular brand not in TOM  or spont','Error9: Frequency of number of brands selected  by each interviewer in aided awareness(Q15)','Error10: Frequency of number of brands selected  by each interviewer in ever smoked(Q16)','Error11: Frequency of number of brands selected  by each interviewer in ever smoked in last 2 years (Q17)','Error12: Frequency of number of brands selected  by each interviewer in ever smoked in last 1 year (Q18)','Error13: Frequency of number of brands selected  by each interviewer in ever smoked in last 1 month (Q19)','Error14 Frequency of number of brands selected  by each interviewer in ever smoked in last 2 weeks(Q20.1)','Error15: Frequency of number of brands selected  by each interviewer in ever smoked in last 1 week(Q20)','Error16: No. of sticksof regular brand (Q23)','Error17: Difference between avg sticks smoked/day & regular brand stick smoked/day','Error18: Price fluctuation between Previous  & regular brand ','Error19: Price fluctuation between alternate  & regular brand ','Error20:Price quoted for MOUB','Error21: Percentage of loose vs pack','Error22: Sticks, a pack consist of?',' Error23: Mild or strong? (Q31)',' Error24: Regualr brand is Mild or strong? (Q32)',' Error26: Number of times Statements being coded (C1)','  Error27: Statement selection (C2)',' Error28: Just Right scale (C3)',' Error30: Reasons to smoke regular brand (D1)',' Error: Awareness of Cig with Capsule (H1)',' Error: Capsule bursting (H5)',' Error: Reasons not regularly smoke a Capsule cigarette (H7)',' Error: Seen this PACKET of cigarette brand Blue Charms? (S3)',' Error: How much do you like the PACKET of this cigarette brand? (S4)','  Error: how much you agree or disagree with each of the statement (S5)','  Error: GPS data absent','Error:For brand frequency count interview wise (E1)','Error:For brand frequency count interview wise (G1']
 
 
 df_name = pd.DataFrame(topics, columns=['Logic list'])
+# df_name = pd.DataFrame({
+#     'Logic list 1': topics1,
+#     'Logic list 2': topics2,
+#     'Logic list 3': topics3
+# })
+
+
+
+
 df_name.to_excel(output_path, index=False)
 
 
@@ -79,7 +106,13 @@ def inside_append_dataframe_with_blank_rows(file_path, dataframe, blank_rows=2):
             startrow=reader.shape[0] + blank_rows,
             index=True,
             header=True)
-
+    workbook = load_workbook(file_path)
+    sheet = workbook.active
+    fill = PatternFill(start_color="E6E6FA", end_color="E6E6FA", fill_type="solid")
+    for row in range(startrow + 4, startrow + 3 + len(dataframe)):
+        cell = sheet.cell(row=row, column=1)  # Assuming index is in the first column
+        cell.fill = fill
+    workbook.save(file_path)      
          
     # workbook = load_workbook(file_path)
     # worksheet = workbook.active
@@ -472,10 +505,10 @@ result = result.rename(columns={
 # count1['Total']=count1.sum(min_count=1,axis=1)
 
 
-# total=count1.sum()
-# # total.name='Total'
-# # count1=count1._append(total)
-# count1.loc['Total']=total
+total=result.sum()
+total.name='Total'
+result=result._append(total)
+result.loc['Total']=total
 
 
 # inside_append_dataframe_with_blank_rows(output_path, df_modified)
@@ -538,9 +571,9 @@ inside_append_dataframe_with_blank_rows(output_path, Valuecount)
 
 
 
-# Error2: Age vs CWE
+# Error2: Age vs CWE="No"
 
-Error_n = ['Error2: Age vs CWE']
+Error_n = ['Error2: Age vs CWE="No"']
 df_name= pd.DataFrame(Error_n) 
 existing_df = pd.read_excel(output_path)
 startrow = existing_df.shape[0] + 4
@@ -904,7 +937,7 @@ total=crosstab_result.sum()
 total.name='Total'
 crosstab_result=crosstab_result._append(total)
 count1=pd.DataFrame(crosstab_result )
-inside_append_dataframe_with_blank_rows(output_path, df_modified)
+# inside_append_dataframe_with_blank_rows(output_path, df_modified)
 inside_append_dataframe_with_blank_rows(output_path, count1)
 
 
@@ -1521,6 +1554,13 @@ with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='o
 
 df_global=df.copy()
 df_filtered = df_global[df_global['Q29_1'] != -1]
+
+input_string1=[1,2,3,4]
+input_string2=['5 sticks','10 sticks','16 sticks','20 sticks']
+dictionary=dict(zip(input_string1,input_string2))
+df_filtered['Q29_1']=df_filtered['Q29_1'].replace(dictionary)
+
+
 df_modified = df_filtered.loc[:, ['Q29_1', 'Interviewer']]
 crosstab_result = pd.crosstab(df_modified['Interviewer'], df_modified['Q29_1'])
 count1=pd.DataFrame(crosstab_result )
@@ -1534,6 +1574,12 @@ count1.loc['Total']=total
 
 
 inside_append_dataframe_with_blank_rows(output_path, count1)
+
+
+
+
+
+
 
 
 
@@ -1584,9 +1630,9 @@ inside_append_dataframe_with_blank_rows(output_path, Df_buyerspercen)
 
 
 
-# Error24: Regualr brand is Mild or strong? (Q32)
+# Error24: Regular + Previous is Mild or strong? (Q32)
 
-Error_n = [' Error24: Regualr brand is Mild or strong? (Q32)']
+Error_n = [' Error24: Regular + Previous is Mild or strong? (Q32)']
 df_name= pd.DataFrame(Error_n) 
 existing_df = pd.read_excel(output_path)
 startrow = existing_df.shape[0] + 4
@@ -1599,8 +1645,8 @@ columns_to_process = [f'T_Q32_{i}' for i in range(1, 102)]
 
 # Replace -1 with NaN in the specified columns
 df_global[columns_to_process] = df_global[columns_to_process].replace(-1, np.nan)
-df_global[columns_to_process] = df_global[columns_to_process].replace(1, 'Strong')
-df_global[columns_to_process] = df_global[columns_to_process].replace(2, 'Mild')
+df_global[columns_to_process] = df_global[columns_to_process].replace(2, 'Strong')
+df_global[columns_to_process] = df_global[columns_to_process].replace(1, 'Mild')
 
 
 
@@ -1635,7 +1681,122 @@ dictionary = dict(zip(input_string1, input_string2))
 
 summary_df['Brand'] = summary_df['Brand'].replace(dictionary)
 
+
 inside_append_dataframe_with_blank_rows(output_path, summary_df)
+
+
+
+
+
+
+
+
+
+Error_n = [' Error24a: Regualr brand is Mild or strong? (Q32) vs Previous brand is mild or strong']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+df_global = df.copy()
+
+
+
+
+
+brand_names = {
+    'Brand_{}'.format(i): 'Brand{}'.format(i) for i in range(1, 127)
+}
+
+
+
+
+
+
+
+
+# Function to count strong and mild codes for a given brand column
+def count_strong_mild(df, brand_col):
+    strong_mild_counts = {f'T_Q32_{i}': {'strong': 0, 'mild': 0} for i in range(1, 127)}
+    
+    for index, row in df.iterrows():
+        brand_code = row[brand_col]
+        if not pd.isna(brand_code)and brand_code != -1:
+            q32_col = f'T_Q32_{int(brand_code)}'
+            if row[q32_col] == 2:
+                strong_mild_counts[q32_col]['strong'] += 1
+            elif row[q32_col] == 1:
+                strong_mild_counts[q32_col]['mild'] += 1
+    
+    return pd.DataFrame(strong_mild_counts).T
+
+# Count strong and mild for regular brand (Q21)
+regular_brand_counts = count_strong_mild(df_global, 'Q21')
+
+# Count strong and mild for previous brand (Q24)
+previous_brand_counts = count_strong_mild(df_global, 'Q24')
+
+# Creating dict to rename index
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q32')
+brand_names = dict(zip(df_dictformation['Index'], df_dictformation['Brandname']))
+
+
+
+regular_brand_counts = regular_brand_counts.rename(index=brand_names)
+previous_brand_counts = previous_brand_counts.rename(index=brand_names)
+
+
+result = pd.concat([regular_brand_counts, previous_brand_counts], axis=1)
+
+
+# Creating a MultiIndex for the columns
+header = pd.MultiIndex.from_tuples(
+    [('Regular Brand', 'Strong'), ('Regular Brand', 'Mild'), ('Previous Brand', 'Strong'), ('Previous Brand', 'Mild')],
+    names=['Brand type', 'Nature']
+)
+
+# Assigning the MultiIndex to the DataFrame columns
+result.columns = header
+
+
+
+
+
+
+
+
+
+inside_append_dataframe_with_blank_rows(output_path, result)
+
+
+
+# Error_n = [' Error24b: Previous brand Mild or Strong (Q32)']
+# df_name= pd.DataFrame(Error_n) 
+# existing_df = pd.read_excel(output_path)
+# startrow = existing_df.shape[0] + 4
+# with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+#     df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+# inside_append_dataframe_with_blank_rows(output_path, previous_brand_counts)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2169,9 +2330,9 @@ inside_append_dataframe_with_blank_rows(output_path, count1)
 
 
 
-# Error: how much you agree or disagree with each of the statement (S5)
+# Error: How much you agree or disagree with each of the statement (S5)
 
-Error_n = ['  Error: how much you agree or disagree with each of the statement (S5)']
+Error_n = ['  Error: How much you agree or disagree with each of the statement (S5)']
 df_name= pd.DataFrame(Error_n) 
 existing_df = pd.read_excel(output_path)
 startrow = existing_df.shape[0] + 4
@@ -2196,11 +2357,11 @@ columns_to_process = [f'T_S5_{i}' for i in range(1,5)]
 
 # Replace -1 with NaN in the specified columns
 df_global[columns_to_process] = df_global[columns_to_process].replace(-1, np.nan)
-df_global[columns_to_process] = df_global[columns_to_process].replace(1, 'Ex Diss')
-df_global[columns_to_process] = df_global[columns_to_process].replace(2, 'Diss')
-df_global[columns_to_process] = df_global[columns_to_process].replace(3, 'N S/D')
-df_global[columns_to_process] = df_global[columns_to_process].replace(4, 'SS')
-df_global[columns_to_process] = df_global[columns_to_process].replace(5, 'ES')
+df_global[columns_to_process] = df_global[columns_to_process].replace(1, 'Comp disagree')
+df_global[columns_to_process] = df_global[columns_to_process].replace(2, 'Somewhat dis')
+df_global[columns_to_process] = df_global[columns_to_process].replace(3, 'Neither agree/disagree')
+df_global[columns_to_process] = df_global[columns_to_process].replace(4, 'Somewhat agree')
+df_global[columns_to_process] = df_global[columns_to_process].replace(5, 'Completely agree')
 
 
 
@@ -2210,27 +2371,27 @@ df_global[columns_to_process] = df_global[columns_to_process].replace(5, 'ES')
 
 
 # List of columns to process
-columns_to_process = [f'T_C2_{i}' for i in range(1, 6)]
+columns_to_process = [f'T_S5_{i}' for i in range(1, 5)]
 
 # Initialize a dictionary to store the counts
-counts = {'Statement': [], 'Ex Diss': [], 'Diss': [],'N S/D': [],'SS': [],'ES': []}
+counts = {'Statement': [], 'Comp disagree': [], 'Somewhat dis': [],'Neither agree/disagree': [],'Somewhat agree': [],'Completely agree': []}
 
 # Loop through each column and count the occurrences of 1 and 2
 for column in columns_to_process:
-    Ex_Diss_count = (df_global[column] =='Ex Diss').sum()
-    Diss_count = (df_global[column] == 'Diss').sum()
-    NSD_count = (df_global[column] =='N S/D').sum()
+    Comp_disagree_count = (df_global[column] =='Comp disagree').sum()
+    Somewhat_dis_count = (df_global[column] == 'Somewhat dis').sum()
+    NAD_count = (df_global[column] =='Neither agree/disagree').sum()
     
-    SS_count = (df_global[column] =='SS').sum()
+    SA_count = (df_global[column] =='Somewhat agree').sum()
     
-    ES_count = (df_global[column] =='ES').sum()
+    CA_count = (df_global[column] =='Completely agree').sum()
    
     counts['Statement'].append(column)
-    counts['Ex Diss'].append(Ex_Diss_count)
-    counts['Diss'].append(Diss_count)
-    counts['N S/D'].append(NSD_count)
-    counts['SS'].append(SS_count)
-    counts['ES'].append(ES_count)
+    counts['Comp disagree'].append(Comp_disagree_count)
+    counts['Somewhat dis'].append(Somewhat_dis_count)
+    counts['Neither agree/disagree'].append(NAD_count)
+    counts['Somewhat agree'].append(SA_count)
+    counts['Completely agree'].append(CA_count)
 
 # Create a summary DataFrame
 summary_df = pd.DataFrame(counts)
@@ -2337,7 +2498,7 @@ inside_append_dataframe_with_blank_rows(output_path, missing_values)
 # For brand frequencycount
 
 
-Error_n = ['Error:For brand frequency countinterview wise (E1)']
+Error_n = ['Error:For brand frequency count interview wise (E1)']
 df_name= pd.DataFrame(Error_n) 
 existing_df = pd.read_excel(output_path)
 startrow = existing_df.shape[0] + 4
@@ -2352,6 +2513,198 @@ df_global=df.copy()
 combined_brands = pd.concat([df_global['T_E1_BrandName_1'], df_global['T_E1_BrandName_2'], df_global['T_E1_BrandName_3']])
 combined_brand_counts = combined_brands.value_counts()
 Valuecount=pd.DataFrame(combined_brand_counts)
+# total_sum = Valuecount.sum()
+# total_sum.name = 'Total'
+# Valuecount=Valuecount._append(total_sum)
+
+
+
+# For brand frequency count interview wise
+interviewer_brand_counts = df.groupby('Interviewer')[['T_E1_BrandName_1', 'T_E1_BrandName_2', 'T_E1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
+# total=interviewer_brand_counts.sum()
+# total.name='Total'
+# interviewer_brand_counts=interviewer_brand_counts._append(total)
+
+
+
+
+
+
+
+
+
+
+
+inside_append_dataframe_with_blank_rows(output_path, Valuecount)
+
+inside_append_dataframe_with_blank_rows(output_path, interviewer_brand_counts)
+
+
+
+
+Error_n = [' Error For 1st brand (E1):  Reason not to smoke it on regular basis ' ]
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','E1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column1'], df_dictformation['Statement1']))
+
+
+
+
+
+df_global.rename(columns=dict_format, inplace=True)
+print(df_global)
+
+df_global[list(dict_format.values())] =df_global[list(dict_format.values())].replace(-1, np.nan)
+
+
+
+
+
+
+result = df_global.groupby('Interviewer')[list(dict_format.values())].sum()
+
+
+result['Total']=result.sum(min_count=1,axis=1)
+total=result.sum()
+total.name='Total'
+result=result._append(total)
+inside_append_dataframe_with_blank_rows(output_path, result)
+
+
+
+
+
+
+
+Error_n = [' Error For 2nd brand (E1):  Reason not to smoke it on regular basis ' ]
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','E1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column2'], df_dictformation['Statement2']))
+
+
+
+
+
+df_global.rename(columns=dict_format, inplace=True)
+print(df_global)
+
+df_global[list(dict_format.values())] =df_global[list(dict_format.values())].replace(-1, np.nan)
+
+
+
+
+
+
+result = df_global.groupby('Interviewer')[list(dict_format.values())].sum()
+
+
+result['Total']=result.sum(min_count=1,axis=1)
+total=result.sum()
+total.name='Total'
+result=result._append(total)
+inside_append_dataframe_with_blank_rows(output_path, result)
+
+
+
+
+
+Error_n = [' Error For 3rd brand (E1):  Reason not to smoke it on regular basis ' ]
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','E1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column3'], df_dictformation['Statement3']))
+
+
+
+
+
+df_global.rename(columns=dict_format, inplace=True)
+print(df_global)
+
+df_global[list(dict_format.values())] =df_global[list(dict_format.values())].replace(-1, np.nan)
+
+
+
+
+
+
+result = df_global.groupby('Interviewer')[list(dict_format.values())].sum()
+
+
+result['Total']=result.sum(min_count=1,axis=1)
+total=result.sum()
+total.name='Total'
+result=result._append(total)
+inside_append_dataframe_with_blank_rows(output_path, result)
+
+
+
+
+
+
+
+
+
+
+# For brand frequencycount
+
+
+Error_n = ['Error:For brand frequency count interview wise (G1)']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+
+
+df_global=df.copy()
+combined_brands = pd.concat([df_global['T_G1_BrandName_1'], df_global['T_G1_BrandName_2'], df_global['T_G1_BrandName_3']])
+combined_brand_counts = combined_brands.value_counts()
+Valuecount=pd.DataFrame(combined_brand_counts)
 total_sum = Valuecount.sum()
 total_sum.name = 'Total'
 Valuecount1=Valuecount._append(total_sum)
@@ -2359,19 +2712,10 @@ Valuecount1=Valuecount._append(total_sum)
 
 
 # For brand frequency count interview wise
-interviewer_brand_counts = df.groupby('Interviewer')[['T_E1_BrandName_1', 'T_E1_BrandName_2', 'T_E1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
+interviewer_brand_counts = df.groupby('Interviewer')[['T_G1_BrandName_1', 'T_G1_BrandName_2', 'T_G1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
 total=interviewer_brand_counts.sum()
 total.name='Total'
 interviewer_brand_counts=interviewer_brand_counts._append(total)
-
-
-
-
-
-
-
-
-
 
 
 inside_append_dataframe_with_blank_rows(output_path, Valuecount1)
@@ -2383,6 +2727,279 @@ inside_append_dataframe_with_blank_rows(output_path, interviewer_brand_counts)
 
 
 
+
+
+
+Error_n = [' Error For 1st brand (G1):  Reason not to smoke it on regular basis ' ]
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','G1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column1'], df_dictformation['Statement1']))
+
+
+
+
+
+df_global.rename(columns=dict_format, inplace=True)
+print(df_global)
+
+df_global[list(dict_format.values())] =df_global[list(dict_format.values())].replace(-1, np.nan)
+
+
+
+
+
+
+result = df_global.groupby('Interviewer')[list(dict_format.values())].sum()
+
+
+result['Total']=result.sum(min_count=1,axis=1)
+total=result.sum()
+total.name='Total'
+result=result._append(total)
+inside_append_dataframe_with_blank_rows(output_path, result)
+
+
+
+
+
+
+
+Error_n = [' Error For 2nd brand (G1):  Reason not to smoke it on regular basis ' ]
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','G1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column2'], df_dictformation['Statement2']))
+
+
+
+
+
+df_global.rename(columns=dict_format, inplace=True)
+print(df_global)
+
+df_global[list(dict_format.values())] =df_global[list(dict_format.values())].replace(-1, np.nan)
+
+
+
+
+
+
+result = df_global.groupby('Interviewer')[list(dict_format.values())].sum()
+
+
+result['Total']=result.sum(min_count=1,axis=1)
+total=result.sum()
+total.name='Total'
+result=result._append(total)
+inside_append_dataframe_with_blank_rows(output_path, result)
+
+
+
+
+
+Error_n = [' Error For 3rd brand (G1):  Reason not to smoke it on regular basis ' ]
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','G1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column3'], df_dictformation['Statement3']))
+
+
+
+
+
+df_global.rename(columns=dict_format, inplace=True)
+print(df_global)
+
+df_global[list(dict_format.values())] =df_global[list(dict_format.values())].replace(-1, np.nan)
+
+
+
+
+
+
+result = df_global.groupby('Interviewer')[list(dict_format.values())].sum()
+
+
+result['Total']=result.sum(min_count=1,axis=1)
+total=result.sum()
+total.name='Total'
+result=result._append(total)
+inside_append_dataframe_with_blank_rows(output_path, result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # For statement frequency
+
+
+# # Initialize a dictionary to store the counts
+# statement_counts = {'Statement1': 0, 'Statement2': 0, 'Statement3': 0}
+
+# # Define the mapping of statements to their respective columns
+# statement_mapping = {
+#     'Statement1': ['I_1_A_E1_2','I_1_A_E1_3','I_1_A_E1_5','I_1_A_E1_7','I_1_A_E1_8','I_1_A_E1_9','I_1_A_E1_10','I_1_A_E1_11','I_1_A_E1_12','I_1_A_E1_14','I_1_A_E1_15','I_1_A_E1_17','I_1_A_E1_18','I_1_A_E1_19','I_1_A_E1_20','I_1_A_E1_21','I_1_A_E1_22','I_1_A_E1_24','I_1_A_E1_25','I_1_A_E1_27','I_1_A_E1_28','I_1_A_E1_29','I_1_A_E1_31','I_1_A_E1_32','I_1_A_E1_33','I_1_A_E1_34'],
+#     'Statement2': ['I_2_A_E1_2','I_2_A_E1_3','I_2_A_E1_5','I_2_A_E1_7','I_2_A_E1_8','I_2_A_E1_9','I_2_A_E1_10','I_2_A_E1_11','I_2_A_E1_12','I_2_A_E1_14','I_2_A_E1_15','I_2_A_E1_17','I_2_A_E1_18','I_2_A_E1_19','I_2_A_E1_20','I_2_A_E1_21','I_2_A_E1_22','I_2_A_E1_24','I_2_A_E1_25','I_2_A_E1_27','I_2_A_E1_28','I_2_A_E1_29','I_2_A_E1_31','I_2_A_E1_32','I_2_A_E1_33','I_2_A_E1_34'],
+#     'Statement3': ['I_3_A_E1_2','I_3_A_E1_3','I_3_A_E1_5','I_3_A_E1_7','I_3_A_E1_8','I_3_A_E1_9','I_3_A_E1_10','I_3_A_E1_11','I_3_A_E1_12','I_3_A_E1_14','I_3_A_E1_15','I_3_A_E1_17','I_3_A_E1_18','I_3_A_E1_19','I_3_A_E1_20','I_3_A_E1_21','I_3_A_E1_22','I_3_A_E1_24','I_3_A_E1_25','I_3_A_E1_27','I_3_A_E1_28','I_3_A_E1_29','I_3_A_E1_31','I_3_A_E1_32','I_3_A_E1_33','I_3_A_E1_34']
+# }
+
+# # Iterate over each statement
+# for statement, columns in statement_mapping.items():
+#     # Filter out -1 values and count the occurrences of 1 in these columns
+#     statement_counts[statement] = (df_global[columns] == 1).sum().sum()
+
+# statement_countss = pd.DataFrame(statement_counts,index=[0])
+
+
+
+
+
+
+
+
+
+
+# inside_append_dataframe_with_blank_rows(output_path, Valuecount1)
+
+# inside_append_dataframe_with_blank_rows(output_path, interviewer_brand_counts)
+
+# inside_append_dataframe_with_blank_rows(output_path, statement_countss)
+
+
+
+
+
+
+# Error: Mild or strong? (Q31)
+
+Error_n = [' Error: Frequency of brands coded in Q25']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q25')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+# rename of index
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+Valuecount2=pd.DataFrame(sum_of_columns)
+total_sum = Valuecount2.sum()
+total_sum.name = 'Total'
+Valuecount2=Valuecount2._append(total_sum)
+
+df_global[renamed_columns] = df_global[renamed_columns].replace(-1, np.nan)
+
+
+df_global['sum'] = df_global[renamed_columns].sum(axis=1)
+filtered_df = df_global[df_global['sum'] < 3]
+result_df = filtered_df[['Interviewer']+renamed_columns]
+Valuecount3=result_df['Interviewer'].value_counts()
+Valuecount3=pd.DataFrame(Valuecount3)
+total_sum = Valuecount3.sum()
+total_sum.name = 'Total'
+Valuecount3=Valuecount3._append(total_sum)
+
+
+
+# df_filt=df_global[df_global['sum']<3]['Interviewer',renamed_columns]
+dataframe_filter=pd.DataFrame(result_df)
+
+# Convert non-numeric values to NaN while summing
+df_numeric = dataframe_filter.apply(pd.to_numeric, errors='coerce')
+                                    
+                                    
+df_numeric['Total']=df_numeric.sum(min_count=1, axis=1)
+total_sum = df_numeric.sum()
+total_sum.name = 'Total'
+df_numeric=df_numeric._append(total_sum)
+
+
+
+
+inside_append_dataframe_with_blank_rows(output_path, Valuecount2)
+inside_append_dataframe_with_blank_rows(output_path, Valuecount3)
+inside_append_dataframe_with_blank_rows(output_path, df_numeric)
 
 
 
