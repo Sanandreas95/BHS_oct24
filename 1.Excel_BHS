@@ -8,9 +8,9 @@ from openpyxl.styles import PatternFill
 
 
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\25.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\30.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\22.Vizag_BHSerror.xlsx'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\27.Vijayawada_BHSerror.xlsx'
 
 df = pd.read_excel(input_file,input_sheet)
 
@@ -18,20 +18,20 @@ df = pd.read_excel(input_file,input_sheet)
 
 
 
-df=df[df['Q2'] ==4]
+df=df[df['Q2'] ==5]
 # df=df[df['Q1_1']==1]
 
 df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
 # df = df[df['Date'].dt.date.isin([pd.Timestamp('2024-11-01').date(), pd.Timestamp('2024-11-02').date()])]
 
-df = df[df['Date'].dt.date == pd.Timestamp('2024-11-05').date()]
+df = df[df['Date'].dt.date == pd.Timestamp('2024-11-09').date()]
 
 
 
 
 
 
-ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099]
+ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099,211264913,211264914,211352357,211352361,211248632,211249351,211249871,211250697,211251488,211252071,211252974,211253928,211254778,211256072,211306473,211306474,211354188,211354189,211354190,211354191,211354192,211411349,211411350,211411351,211411352,211411353,211411354]
 df = df[~df['SbjNum'].isin(ID_to_exclude)]
 
 entries_to_exclude = ['test', 'trr','demo','test']
@@ -2513,15 +2513,31 @@ df_global=df.copy()
 combined_brands = pd.concat([df_global['T_E1_BrandName_1'], df_global['T_E1_BrandName_2'], df_global['T_E1_BrandName_3']])
 combined_brand_counts = combined_brands.value_counts()
 Valuecount=pd.DataFrame(combined_brand_counts)
-# total_sum = Valuecount.sum()
-# total_sum.name = 'Total'
-# Valuecount=Valuecount._append(total_sum)
+total_sum = Valuecount.sum()
+
+if isinstance(total_sum, (np.int64, np.float64)):
+    pass
+else:
+    total_sum.name = 'Total'
+    Valuecount=Valuecount._append(total_sum)
+
+
+
+
 
 
 
 # For brand frequency count interview wise
 interviewer_brand_counts = df.groupby('Interviewer')[['T_E1_BrandName_1', 'T_E1_BrandName_2', 'T_E1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
-# total=interviewer_brand_counts.sum()
+total=interviewer_brand_counts.sum()
+
+if isinstance(total, (np.int64, np.float64)):
+    pass
+else:
+    total.name = 'Total'
+    interviewer_brand_counts=interviewer_brand_counts._append(total)
+
+
 # total.name='Total'
 # interviewer_brand_counts=interviewer_brand_counts._append(total)
 
@@ -2706,16 +2722,39 @@ combined_brands = pd.concat([df_global['T_G1_BrandName_1'], df_global['T_G1_Bran
 combined_brand_counts = combined_brands.value_counts()
 Valuecount=pd.DataFrame(combined_brand_counts)
 total_sum = Valuecount.sum()
-total_sum.name = 'Total'
-Valuecount1=Valuecount._append(total_sum)
+
+
+
+if isinstance(total_sum, (np.int64, np.float64)):
+    pass
+else:
+    total_sum.name = 'Total'
+    Valuecount1=Valuecount._append(total_sum)
+
+
+
+
+
+
 
 
 
 # For brand frequency count interview wise
 interviewer_brand_counts = df.groupby('Interviewer')[['T_G1_BrandName_1', 'T_G1_BrandName_2', 'T_G1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
 total=interviewer_brand_counts.sum()
-total.name='Total'
-interviewer_brand_counts=interviewer_brand_counts._append(total)
+
+
+if isinstance(total, (np.int64, np.float64)):
+    pass
+else:
+    total.name = 'Total'
+    
+    interviewer_brand_counts=interviewer_brand_counts._append(total)
+
+
+
+
+
 
 
 inside_append_dataframe_with_blank_rows(output_path, Valuecount1)
@@ -2932,7 +2971,7 @@ inside_append_dataframe_with_blank_rows(output_path, result)
 
 
 
-# Error: Mild or strong? (Q31)
+# Error: Frequency of brands coded in Q25
 
 Error_n = [' Error: Frequency of brands coded in Q25']
 df_name= pd.DataFrame(Error_n) 
@@ -2998,7 +3037,22 @@ df_numeric=df_numeric._append(total_sum)
 
 
 inside_append_dataframe_with_blank_rows(output_path, Valuecount2)
+
+
+
+
+
+Error_n = [' Interviewer who coded less than 3 brands and its frequency count']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+    
 inside_append_dataframe_with_blank_rows(output_path, Valuecount3)
+
+
+
 inside_append_dataframe_with_blank_rows(output_path, df_numeric)
 
 
