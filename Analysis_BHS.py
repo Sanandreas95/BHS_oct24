@@ -4,23 +4,29 @@ import pandas as pd
 import numpy as np
 from openpyxl.styles import Alignment
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\30.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\36.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Analysis\27Vijayawada_BHSanalysis.xlsx'
-
 df = pd.read_excel(input_file,input_sheet)
-
-entries_to_exclude = ['test', 'trr','demo','test']
-df = df[~df['Interviewer'].isin(entries_to_exclude)]
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Analysis\33VijayawadaTotal_BHSanalysis.xlsx'
 
 
-ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099,211264913,211264914,211352357,211352361,211248632,211249351,211249871,211250697,211251488,211252071,211252974,211253928,211254778,211256072,211306473,211306474,211354188,211354189,211354190,211354191,211354192,211411349,211411350,211411351,211411352,211411353,211411354]
-df = df[~df['SbjNum'].isin(ID_to_exclude)]
+input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v2 14 Nov 2024.xlsx'
+input_sheet1 = 'Sheet1'
 
+
+df_todelete=pd.read_excel(input_file1,input_sheet1)
+
+# entries_to_exclude = ['test', 'trr','demo','test']
+# df = df[~df['Interviewer'].isin(entries_to_exclude)]
+
+
+# ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099,211264913,211264914,211352357,211352361,211248632,211249351,211249871,211250697,211251488,211252071,211252974,211253928,211254778,211256072,211306473,211306474,211354188,211354189,211354190,211354191,211354192,211411349,211411350,211411351,211411352,211411353,211411354]
+# df = df[~df['SbjNum'].isin(ID_to_exclude)]
+df = df[~df['SbjNum'].isin(df_todelete['SbjNum'])]
 
 
 df=df[df['Q2'] == 5]
-# df=df[df['Q1_1']==2]
+# df=df[df['Q1_1']==1]
 
 # df=df[df['A_Segment_3']==1]
 
