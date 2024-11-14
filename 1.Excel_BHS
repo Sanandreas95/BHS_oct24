@@ -8,13 +8,18 @@ from openpyxl.styles import PatternFill
 
 
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\30.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\36.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\27.Vijayawada_BHSerror.xlsx'
-
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\34.Vijayawada_BHSerror.xlsx'
 df = pd.read_excel(input_file,input_sheet)
 
 
+
+input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v2 14 Nov 2024.xlsx'
+input_sheet1 = 'Sheet1'
+df_todelete=pd.read_excel(input_file1,input_sheet1)
+
+df = df[~df['SbjNum'].isin(df_todelete['SbjNum'])]
 
 
 
@@ -24,18 +29,46 @@ df=df[df['Q2'] ==5]
 df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
 # df = df[df['Date'].dt.date.isin([pd.Timestamp('2024-11-01').date(), pd.Timestamp('2024-11-02').date()])]
 
-df = df[df['Date'].dt.date == pd.Timestamp('2024-11-09').date()]
+# df = df[df['Date'].dt.date == pd.Timestamp('2024-11-13').date()]
+
+
+
+
+
+# Core brands list
+
+
+# For Malda
+# core_brands = ['Special Red Longs - len 69 -Rs 60/10 pc','Flake Special Filter - len 64 -Rs 70/10 pc','Special Red Signature - len 64 -Rs 49/10 pc','Navy Cut Virginia Filter - len 64 -Rs 50/10 pc','Gold Flake Super Star - len 64 -Rs 60/10 pc','Wills Navy Cut Filter - len 69 -Rs 80/10 pc','Special Blues - len 69']
+
+# # For Coochbehar
+# core_brands = ['Special Red Longs - len 69 -Rs 60/10 pc','Flake Special Filter - len 64 -Rs 70/10 pc','Special Red Signature - len 64 -Rs 49/10 pc','Navy Cut Virginia Filter - len 64 -Rs 50/10 pc','Gold Flake Super Star - len 64 -Rs 60/10 pc','Marlboro Pocket Filter - len 64 -Rs 70/10 pc (Q32. Do you consider your regular brand of cigarette to be,)','Special Blues - len 69']
+
+
+
+# # For Bilaspur
+# core_brands = ['Blue Charms - len 64 -Rs 48/10 Pc', 'Flake Excel - len 64 -Rs 65/10 Pc','Flake Liberty - len 64 -Rs 48/10 Pc','Marlboro Pocket Filter - len 64 -Rs 70/10 pc']
+
+
+# # For Vizag and Vijayawada
+core_brands = ['Blue Charms - len 64 -Rs 48/10 Pc', 'Will Flake Premium Filter - len 69 -Rs 90/10 Pc','Duke - len 64 -Rs 50/10 Pc','Berkeley - len 64 -Rs 60/10 Pc']
 
 
 
 
 
 
-ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099,211264913,211264914,211352357,211352361,211248632,211249351,211249871,211250697,211251488,211252071,211252974,211253928,211254778,211256072,211306473,211306474,211354188,211354189,211354190,211354191,211354192,211411349,211411350,211411351,211411352,211411353,211411354]
-df = df[~df['SbjNum'].isin(ID_to_exclude)]
 
-entries_to_exclude = ['test', 'trr','demo','test']
-df = df[~df['Interviewer'].isin(entries_to_exclude)]
+
+
+
+
+
+# ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099,211264913,211264914,211352357,211352361,211248632,211249351,211249871,211250697,211251488,211252071,211252974,211253928,211254778,211256072,211306473,211306474,211354188,211354189,211354190,211354191,211354192,211411349,211411350,211411351,211411352,211411353,211411354]
+# df = df[~df['SbjNum'].isin(ID_to_exclude)]
+
+# entries_to_exclude = ['test', 'trr','demo','test']
+# df = df[~df['Interviewer'].isin(entries_to_exclude)]
 
 
 
@@ -2510,7 +2543,13 @@ with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='o
 
 
 df_global=df.copy()
-combined_brands = pd.concat([df_global['T_E1_BrandName_1'], df_global['T_E1_BrandName_2'], df_global['T_E1_BrandName_3']])
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+brand_columns = ['T_E1_BrandCode_1','T_E1_BrandCode_2','T_E1_BrandCode_3']
+df_global[brand_columns] = df_global[brand_columns].replace(dict_format)
+
+combined_brands = pd.concat([df_global['T_E1_BrandCode_1'], df_global['T_E1_BrandCode_2'], df_global['T_E1_BrandCode_3']])
 combined_brand_counts = combined_brands.value_counts()
 Valuecount=pd.DataFrame(combined_brand_counts)
 total_sum = Valuecount.sum()
@@ -2520,7 +2559,9 @@ if isinstance(total_sum, (np.int64, np.float64)):
 else:
     total_sum.name = 'Total'
     Valuecount=Valuecount._append(total_sum)
+Valuecount['Brand Type'] = Valuecount.index.to_series().apply(lambda x: 'Core Brand' if x in core_brands else 'Non-Core Brand')
 
+# Valuecount['Highlight'] = df['MOUB_Brands'].apply(lambda x: 'Highlight' if x in core_brands else 'Normal')
 
 
 
@@ -2528,7 +2569,7 @@ else:
 
 
 # For brand frequency count interview wise
-interviewer_brand_counts = df.groupby('Interviewer')[['T_E1_BrandName_1', 'T_E1_BrandName_2', 'T_E1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
+interviewer_brand_counts = df.groupby('Interviewer')[['T_E1_BrandCode_1', 'T_E1_BrandCode_2', 'T_E1_BrandCode_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
 total=interviewer_brand_counts.sum()
 
 if isinstance(total, (np.int64, np.float64)):
@@ -2703,6 +2744,16 @@ inside_append_dataframe_with_blank_rows(output_path, result)
 
 
 
+
+
+
+
+
+
+
+
+
+
 # For brand frequencycount
 
 
@@ -2718,7 +2769,14 @@ with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='o
 
 
 df_global=df.copy()
-combined_brands = pd.concat([df_global['T_G1_BrandName_1'], df_global['T_G1_BrandName_2'], df_global['T_G1_BrandName_3']])
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+brand_columns = ['T_G1_BrandCode_1','T_G1_BrandCode_2','T_G1_BrandCode_3']
+df_global[brand_columns] = df_global[brand_columns].replace(dict_format)
+
+combined_brands = pd.concat([df_global['T_G1_BrandCode_1'], df_global['T_G1_BrandCode_2'], df_global['T_G1_BrandCode_3']])
+
 combined_brand_counts = combined_brands.value_counts()
 Valuecount=pd.DataFrame(combined_brand_counts)
 total_sum = Valuecount.sum()
@@ -2729,8 +2787,9 @@ if isinstance(total_sum, (np.int64, np.float64)):
     pass
 else:
     total_sum.name = 'Total'
-    Valuecount1=Valuecount._append(total_sum)
+    Valuecount=Valuecount._append(total_sum)
 
+Valuecount['Brand Type'] = Valuecount.index.to_series().apply(lambda x: 'Core Brand' if x in core_brands else 'Non-Core Brand')
 
 
 
@@ -2740,7 +2799,7 @@ else:
 
 
 # For brand frequency count interview wise
-interviewer_brand_counts = df.groupby('Interviewer')[['T_G1_BrandName_1', 'T_G1_BrandName_2', 'T_G1_BrandName_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
+interviewer_brand_counts = df.groupby('Interviewer')[['T_G1_BrandCode_1', 'T_G1_BrandCode_2', 'T_G1_BrandCode_3']].apply(lambda x: x.stack().value_counts()).unstack().fillna(0)
 total=interviewer_brand_counts.sum()
 
 
@@ -2757,7 +2816,7 @@ else:
 
 
 
-inside_append_dataframe_with_blank_rows(output_path, Valuecount1)
+inside_append_dataframe_with_blank_rows(output_path, Valuecount)
 
 inside_append_dataframe_with_blank_rows(output_path, interviewer_brand_counts)
 
@@ -3054,6 +3113,521 @@ inside_append_dataframe_with_blank_rows(output_path, Valuecount3)
 
 
 inside_append_dataframe_with_blank_rows(output_path, df_numeric)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# For brand frequencycount B1
+
+
+Error_n = ['Error:For brand frequency count  (B1)']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+
+
+df_global=df.copy()
+
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Brand_Code'], df_dictformation['Brand_name']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+
+for key, column_name in dict_format.items():
+    if column_name in df_global.columns:
+        df_global[column_name] = df_global[column_name].replace(-1, 0)
+
+
+sum_of_columns= df_global[renamed_columns].sum()
+Valuecount2=pd.DataFrame(sum_of_columns)
+
+
+inside_append_dataframe_with_blank_rows(output_path, Valuecount2)
+
+
+
+
+
+
+
+
+
+
+
+# Combined statementwise brand count (B1)
+# Count: Statement1
+
+
+Error_n = ['Error:Combined Statementwise brand count  (B1)']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement1'], df_dictformation['Brand1']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount1=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+# Count: Statement2
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement2'], df_dictformation['Brand2']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount2=pd.DataFrame(sum_of_columns)
+
+
+
+
+# Count: Statement3
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement3'], df_dictformation['Brand3']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount3=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+# Count: Statement4
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement4'], df_dictformation['Brand4']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount4=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+# Count: Statement5
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement5'], df_dictformation['Brand5']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount5=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+# Count: Statement6
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement6'], df_dictformation['Brand6']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount6=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+# Count: Statement7
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement7'], df_dictformation['Brand7']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount7=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+# Count: Statement8
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement8'], df_dictformation['Brand8']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount8=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+
+
+# Count: Statement9
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement9'], df_dictformation['Brand9']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount9=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+# Count: Statement10
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement10'], df_dictformation['Brand10']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount10=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+# Count: Statement11
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement11'], df_dictformation['Brand11']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount11=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+
+
+
+# Count: Statement12
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','B1statement')
+
+dict_format = dict(zip(df_dictformation['Statement12'], df_dictformation['Brand12']))
+df_global.rename(columns=dict_format, inplace=True)
+renamed_columns = list(dict_format.values())
+
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+Valuecount12=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+# Concat
+
+
+
+
+resultant = pd.concat([Valuecount1,Valuecount2,Valuecount3,Valuecount4,Valuecount5,Valuecount6,Valuecount7,Valuecount8,Valuecount9,Valuecount10,Valuecount11,Valuecount12], axis=1)
+resultant.columns = ['Overall its a good quality product ','Everything taken together the brand is appealing to me ','It has good taste','It offers satisfying smoking experience','It offers refreshing smoking experience','Brand is for younger people ','Is a modern brand','Is value for money','Proud to smoke with friends/ colleagues','Its for people like me','Is a Premium brand','Is an exciting brand']
+
+total_sum = resultant.sum()
+total_sum.name = 'Total_sum'
+B1_statement_combined=resultant._append(total_sum)
+
+
+
+inside_append_dataframe_with_blank_rows(output_path, B1_statement_combined)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Count = Previous brand (Q24)
+
+Error_n = ['Count = Previous brand (Q24)']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+
+
+
+
+df_s = df_global['Q24'].value_counts()
+
+
+Valuecount12=pd.DataFrame(df_s)
+# total_sum = Valuecount1.sum()
+# total_sum.name = 'Total_sum'
+# Valuecount1=Valuecount1._append(total_sum)
+
+
+
+
+Valuecount12.index = Valuecount12.index.to_series().replace(dict_format)
+
+
+inside_append_dataframe_with_blank_rows(output_path, Valuecount12)
+
 
 
 
