@@ -8,14 +8,14 @@ from openpyxl.styles import PatternFill
 
 
 
-input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\36.BHS.xlsx'
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\38.BHS.xlsx'
 input_sheet = 'Sheet1'
-output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\34.Vijayawada_BHSerror.xlsx'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\37Coochbehar_BHSerror.xlsx'
 df = pd.read_excel(input_file,input_sheet)
 
 
 
-input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v2 14 Nov 2024.xlsx'
+input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v3 16 Nov 2024.xlsx'
 input_sheet1 = 'Sheet1'
 df_todelete=pd.read_excel(input_file1,input_sheet1)
 
@@ -23,13 +23,13 @@ df = df[~df['SbjNum'].isin(df_todelete['SbjNum'])]
 
 
 
-df=df[df['Q2'] ==5]
+df=df[df['Q2'] ==2]
 # df=df[df['Q1_1']==1]
 
 df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
-# df = df[df['Date'].dt.date.isin([pd.Timestamp('2024-11-01').date(), pd.Timestamp('2024-11-02').date()])]
+df = df[df['Date'].dt.date.isin([pd.Timestamp('2024-11-13').date(), pd.Timestamp('2024-11-14').date(),pd.Timestamp('2024-11-15').date()])]
 
-# df = df[df['Date'].dt.date == pd.Timestamp('2024-11-13').date()]
+# df = df[df['Date'].dt.date == pd.Timestamp('2024-11-14').date()]
 
 
 
@@ -42,7 +42,7 @@ df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
 # core_brands = ['Special Red Longs - len 69 -Rs 60/10 pc','Flake Special Filter - len 64 -Rs 70/10 pc','Special Red Signature - len 64 -Rs 49/10 pc','Navy Cut Virginia Filter - len 64 -Rs 50/10 pc','Gold Flake Super Star - len 64 -Rs 60/10 pc','Wills Navy Cut Filter - len 69 -Rs 80/10 pc','Special Blues - len 69']
 
 # # For Coochbehar
-# core_brands = ['Special Red Longs - len 69 -Rs 60/10 pc','Flake Special Filter - len 64 -Rs 70/10 pc','Special Red Signature - len 64 -Rs 49/10 pc','Navy Cut Virginia Filter - len 64 -Rs 50/10 pc','Gold Flake Super Star - len 64 -Rs 60/10 pc','Marlboro Pocket Filter - len 64 -Rs 70/10 pc (Q32. Do you consider your regular brand of cigarette to be,)','Special Blues - len 69']
+core_brands = ['Special Red Longs - len 69 -Rs 60/10 pc','Flake Special Filter - len 64 -Rs 70/10 pc','Special Red Signature - len 64 -Rs 49/10 pc','Navy Cut Virginia Filter - len 64 -Rs 50/10 pc','Gold Flake Super Star - len 64 -Rs 60/10 pc','Marlboro Pocket Filter - len 64 -Rs 70/10 pc','Special Blues - len 69','Flake Excel 69mm']
 
 
 
@@ -51,7 +51,7 @@ df['Date'] = pd.to_datetime(df['Date'], format='%d-%m-%Y %H:%M:%S')
 
 
 # # For Vizag and Vijayawada
-core_brands = ['Blue Charms - len 64 -Rs 48/10 Pc', 'Will Flake Premium Filter - len 69 -Rs 90/10 Pc','Duke - len 64 -Rs 50/10 Pc','Berkeley - len 64 -Rs 60/10 Pc']
+# core_brands = ['Blue Charms - len 64 -Rs 48/10 Pc', 'Will Flake Premium Filter - len 69 -Rs 90/10 Pc','Duke - len 64 -Rs 50/10 Pc','Berkeley - len 64 -Rs 60/10 Pc']
 
 
 
@@ -1383,7 +1383,7 @@ dictionary = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
 
 for df_row in range (len(df_global)):
    
-    if (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q24']])<=2 and (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q24']])>=-2:
+    if (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q24']])<=6 and (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q24']])>=-6:
     
         df_global.drop(df_row,inplace=True)
         # print(df_global.loc[:,['Q21','Q24','Q27']])
@@ -1449,7 +1449,7 @@ dictionary = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
 
 for df_row in range (len(df_global)):
    
-    if (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q25_1']])<=2 and (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q25_1']])>=-2:
+    if (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q25_1']])<=6 and (dictionary[df_global.loc[df_row,'Q21']])-(dictionary[df_global.loc[df_row,'Q25_1']])>=-6:
     
         df_global.drop(df_row,inplace=True)
   
@@ -2220,6 +2220,90 @@ count1.loc['Total']=total
 
 
 inside_append_dataframe_with_blank_rows(output_path, count1)
+
+
+
+
+
+
+
+# Error: When bursting Capsule  (H6)
+
+Error_n = [' Error: When bursting Capsule  (H6)']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+input_string1=[1,2,3,4]
+
+input_string2 = ['Begining','After initial 2-3 puff','In the middle ','Towards end']
+dictionary = dict(zip(input_string1, input_string2))
+df_global['H6'] = df_global['H6'].replace(dictionary)
+df_global['H6'] = df_global['H6'].replace(-1, np.nan)
+
+
+df_modified = df_global.loc[:,['H6','Interviewer']]
+crosstab_result = pd.crosstab(df_modified['Interviewer'], df_modified['H6'])
+count1=pd.DataFrame(crosstab_result )
+count1['Total']=count1.sum(min_count=1,axis=1)
+
+
+total=count1.sum()
+# total.name='Total'
+# count1=count1._append(total)
+count1.loc['Total']=total
+
+
+inside_append_dataframe_with_blank_rows(output_path, count1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3125,6 +3209,178 @@ inside_append_dataframe_with_blank_rows(output_path, df_numeric)
 
 
 
+# Count  :Combined table of Counts for K1
+
+
+Error_n = [' Count  :Combined table of Counts for K1']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+
+
+
+# Create a copy of the global dataframe
+df_global = df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','K1 final')
+
+
+
+
+
+dataframes_dict = {}
+
+for i in range(1, 127):
+# Create the dictionary for renaming columns
+    dict_format = dict(zip(df_dictformation[f'Code{i}'], df_dictformation[f'Statement{i}']))
+    
+    # Rename the columns in the global dataframe
+    df_global.rename(columns=dict_format, inplace=True)
+    
+    # Get the renamed columns
+    renamed_columns = list(dict_format.values())
+    
+    # Calculate the sum of each row across the renamed columns
+       
+    count_value = (df_global[renamed_columns] == 1).sum()
+    
+    count_df = pd.DataFrame(count_value).reset_index()
+    dataframes_dict[f'Brand_{i}'] = count_df
+    
+    
+    
+df_for_brand_126 = dataframes_dict['Brand_126']
+df_for_brand_126['Brand'] = df_for_brand_126.groupby('index').cumcount() + 1
+
+# Step 2: Pivot the DataFrame to get the desired format
+pivot_df = df_for_brand_126.pivot(index='index', columns='Brand', values=0)
+
+# Step 3: Rename columns to match the desired output format
+pivot_df.columns = [f'Brand {col} count' for col in pivot_df.columns]
+
+# Reset index to make 'Index' a column again if needed
+# pivot_df.reset_index(inplace=True)
+
+# Display the final DataFrame
+print(pivot_df)
+    
+
+new_column_names  = [
+    'American Club - len 84 -Rs 120/10 pc', 'Cavanders Gold Rich Taste - len 64', 'Chancellor - len 64',
+    'Charminar Filter - len 64 -Rs 40/10 pc', 'Charms Special Blue - len 69', 'Classic - len 84 -Rs 340/20 pc',
+    'Editions Trio - len 92 -Rs 160/16 pc', 'Flake Special Filter - len 64 -Rs 70/10 pc', 'Focus Mint - len 64',
+    'Gold Flake Kings - len 84 -Rs 170/10 pc', 'Gold Flake Premium - len 69 -Rs 95/10 pc',
+    'Gold Flake Premium Neo Smart - len 69 -Rs 95/10 pc', 'Gold Flake Indie Mint - len 69 -Rs 100/10 pc',
+    'Gold Flake Special - len 64', 'Gold Flake Special Mint - len 64', 'Gold Flake Super Star - len 64 -Rs 60/10 pc',
+    'India King - len 84 -Rs 360/20 pc', 'Marlboro KSFT - len 84 -Rs 170/10 pc', 'Marlboro Advance Compact - len 69 -Rs 95/10 pc',
+    'Marlboro Pocket Filter - len 64 -Rs 70/10 pc', 'Navy Cut Fruit - len 69', 'Navy Cut Virginia Filter - len 64 -Rs 50/10 pc',
+    'Red & White Select - len 64', 'Red & White Select-Premium - len 69', 'Regent - len 64', 'Regent Black - len 64 -Rs 45/10 pc',
+    'Regent Cool - len 64', 'Silk Cut Blue - len 64 -Rs 50/10 pc', 'Silk Cut Filter - len 64 -Rs 60/10 pc',
+    'Silk Cut Virginia - len 64 -Rs 80/10 pc', 'Special Blues - len 69', 'Special Red Longs - len 69 -Rs 60/10 pc',
+    'Special Red Signature - len 64 -Rs 49/10 pc', 'Stellar Cool Blast - len 69', 'T3 White - len 92 -Rs 160/16 Pc',
+    'Total Refresh - len 69 -Rs 60/10 pc', 'Total Royal Twist - len 69 -Rs 60/10 pc', 'Total Spearmint - len 69 -Rs 60/10 pc',
+    'Wave Cool Mint - len 69 -Rs 60/10 pc', 'Wills Navy Cut Filter - len 69 -Rs 80/10 pc', 'Wills Navy Cut- Longs - len 74 -Rs 110/10 pc',
+    'American Club Mint - len 84', 'American Club Smash - len 84 -Rs 120/10 Pc', 'American Fruit - len 84 -Rs 130/10 Pc',
+    'Benson & Hedges - len 84 -Rs 340/20 Pc', 'Berkeley - len 64 -Rs 60/10 Pc', 'Berkely - Hero - len 64 -Rs 45/10 Pc',
+    'Blue Charms - len 64 -Rs 48/10 Pc', 'Blue Charms - len 69', 'Bristol - len 64', 'Cavander Gold - len 64',
+    'Chancellor - len 69', 'Charminar Plains - len 64', 'Charms Regular Filter - len 64', 'Classic Connect - len 97 -Rs 300/20 Pc',
+    'Classic Ice Burst - len 84 -Rs 170/10 Pc', 'Club One - len 84', 'Duke - len 64 -Rs 50/10 Pc',
+    'Editions Active Mint - len 84 -Rs 120/10 Pc', 'Editions Ice Fruit - len 84 -Rs 100/10 Pc',
+    'Editions Spark - len 84 -Rs 120/10 Pc', 'Flake Excel - len 64 -Rs 65/10 Pc', 'Flake Liberty - len 64 -Rs 48/10 Pc',
+    'Flake Mint Switch - len 69 -Rs 69/10 Pc', 'Flake Nova - len 69', 'Flake White - len 64',
+    'Gold Flake Century - len 64 -Rs 60/10 Pc', 'Gold Flake Filter - len 69 -Rs 100/10 Pc',
+    'Gold Flake Filter - Neo Smart - len 69 -Rs 100/10 Pc', 'Gold Flake Kings - MixPOD - len 84 -Rs 170/10 Pc',
+    'Gold Flake Kings Lights - len 84 -Rs 170/10 Pc', 'Gold Flake Kings SLK - len 84 -Rs 224/16 Pc',
+    'Golden Gold Flake - len 64', 'Kingston - len 64', 'Marlboro Clove - len 84 -Rs 170/10 Pc',
+    'Marlboro Fuse Beyond - len 84', 'NATIONAL GOLD FLAKE - len 64', 'Navy Cut Deluxe Filter - len 69 -Rs 95/10 Pc',
+    'Originals - len 64', 'Panama - len 64', 'Panama Filter - len 64', 'Panama Filter - len 69',
+    'Player\'s Fruit - len 69 -Rs 70/10 Pc', 'Player\'s Mint - len 69', 'Royal - len 64',
+    'Scissors Menthol - len 69', 'Classic - len 84 -Rs 170/10 Pc', 'Stellar Slims Define - len 97 -Rs 200/20 Pc',
+    'Stellar Slims Shift - len 97 -Rs 200/20 Pc', 'Total Active Mint - len 64', 'Wave Fruity - len 69 -Rs 60/10 Pc',
+    'Wave Mint - len 69', 'Will Flake Premium Filter - len 69 -Rs 90/10 Pc', 'Zaffran - len 69',
+    'American Club Clove Magik - len 84 - Rs 140/10 Pc', 'Classic AlphaTec - len 84 - Rs 340/20 Pc',
+    'Classic Double Burst - len 84 - Rs 340/20 Pc', 'Classic Verve - len 84 - Rs 240/16 Pc',
+    'Stellar Define Pan - len 97 - Rs 200/20 Pc', 'Stellar Shift Duos - len 97 - Rs 240/20 Pc',
+    'Wills Insignia - len 97 - Rs 400/20 Pc', 'Dummy 1', 'Dummy 2', 'Dummy 3', 'Dummy 4', 'Dummy 5',
+    'Dummy 6', 'Dummy 7', 'Dummy 8', 'Dummy 9', 'Dummy 10', 'Dummy 11', 'Dummy 12', 'Dummy 13',
+    'Dummy 14', 'Dummy 15', 'Dummy 16', 'Dummy 17', 'Dummy 18', 'Dummy 19', 'Dummy 20',
+    'Other please specify TOM', 'Other please specify Spont 1', 'Other please specify Spont 2',
+    'Other please specify Spont 3', 'Other please specify Spont 4'
+]
+
+
+# total_sum = resultant.sum()
+# total_sum.name = 'Total_sum'
+# resultant=resultant._append(total_sum)
+
+
+
+
+
+
+# Ensure the length of new_column_names matches the number of columns in pivot_df
+if len(new_column_names) == pivot_df.shape[1]:
+    pivot_df.columns = new_column_names
+else:
+    print("Error: The number of new column names does not match the number of columns in pivot_df.")
+
+# Display the updated DataFrame
+# print(pivot_df)
+
+pivot_df['Total']=pivot_df.sum(min_count=1,axis=1)
+
+total_sum = pivot_df.sum()
+total_sum.name = 'Total_sum'
+pivot_df=pivot_df._append(total_sum)
+
+
+
+
+
+inside_append_dataframe_with_blank_rows(output_path, pivot_df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # For brand frequencycount B1
@@ -3612,6 +3868,7 @@ dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
 
 
 
+
 df_s = df_global['Q24'].value_counts()
 
 
@@ -3627,6 +3884,68 @@ Valuecount12.index = Valuecount12.index.to_series().replace(dict_format)
 
 
 inside_append_dataframe_with_blank_rows(output_path, Valuecount12)
+
+
+
+
+
+
+# Count: Payment Mode (P1)
+
+Error_n = [' Count: Payment Mode (P1)']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+df_global=df.copy()
+
+df_s1 = df_global['T_P1_1'].value_counts()
+df_s2 = df_global['T_P1_2'].value_counts()
+
+resultant = pd.concat([df_s1,df_s2],axis=1)
+resultant.columns=['By Cash','Digital']
+
+
+total_sum = resultant.sum()
+total_sum.name = 'Total_sum'
+resultant=resultant._append(total_sum)
+
+
+
+
+
+inside_append_dataframe_with_blank_rows(output_path, resultant)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
