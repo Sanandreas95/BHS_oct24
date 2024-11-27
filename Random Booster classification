@@ -1,0 +1,151 @@
+from openpyxl import Workbook
+from openpyxl import load_workbook
+import pandas as pd
+import numpy as np
+from openpyxl.styles import Alignment
+from openpyxl.styles import PatternFill
+import matplotlib.pyplot as plt
+
+
+
+
+# input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\39.BHS.xlsx'
+# input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\42.BHS.xlsx'
+# input_sheet = 'Sheet1'
+
+
+input_file =  r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\45_deletedID_C3excluded_BHSerror.xlsx'
+input_sheet = 'Sheet1'
+
+
+
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\capsulecheck_BHSerror.csv'
+df = pd.read_excel(input_file,input_sheet)
+
+
+
+input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v4 19 Nov 2024.xlsx'
+input_sheet1 = 'Sheet1'
+df_todelete=pd.read_excel(input_file1,input_sheet1)
+
+
+
+
+
+# df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+# dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+# df.rename(columns=dict_format, inplace=True)
+
+
+
+
+
+
+df = df[~df['SbjNum'].isin(df_todelete['SbjNum'])]
+
+df=df[df['Q2'] ==3]
+
+df_global=df.copy()
+
+
+
+# Core brands list
+
+
+# # For Malda
+# core_brands = ['Special Red Longs - len 69 -Rs 60/10 pc','Flake Special Filter - len 64 -Rs 70/10 pc','Special Red Signature - len 64 -Rs 49/10 pc','Navy Cut Virginia Filter - len 64 -Rs 50/10 pc','Gold Flake Super Star - len 64 -Rs 60/10 pc','Wills Navy Cut Filter - len 69 -Rs 80/10 pc','Special Blues - len 69']
+# core_brands_code=[32,8,33,22,16,40,31]
+
+
+
+
+# # For Coochbehar
+# core_brands = ['Special Red Longs - len 69 -Rs 60/10 pc','Flake Special Filter - len 64 -Rs 70/10 pc','Special Red Signature - len 64 -Rs 49/10 pc','Navy Cut Virginia Filter - len 64 -Rs 50/10 pc','Gold Flake Super Star - len 64 -Rs 60/10 pc','Marlboro Pocket Filter - len 64 -Rs 70/10 pc','Special Blues - len 69','Flake Excel 69mm']
+# core_brands_code=[32,8,33,22,16,20,31,102]
+
+
+# # For Bilaspur
+core_brands = ['Blue Charms - len 64 -Rs 48/10 Pc', 'Flake Excel - len 64 -Rs 65/10 Pc','Flake Liberty - len 64 -Rs 48/10 Pc','Marlboro Pocket Filter - len 64 -Rs 70/10 pc']
+core_brands_code=[48,62,63,20]
+
+
+# For Vizag and Vijayawada
+# core_brands = ['Blue Charms - len 64 -Rs 48/10 Pc', 'Will Flake Premium Filter - len 69 -Rs 90/10 Pc','Duke - len 64 -Rs 50/10 Pc','Berkeley - len 64 -Rs 60/10 Pc']
+# core_brands_code=[48,93,58,46]
+
+
+
+
+
+
+
+
+
+
+
+
+
+df_random = df_global[df_global['Q1_1'] == 1]
+
+
+df_boostertotal=df_global[df_global['Q1_1']==2]
+
+
+
+df_booster2=df_global[df_global['A_Segment_2']==1]
+rows_df_booster2 = len(df_booster2)
+
+
+
+
+df_booster3=df_global[df_global['A_Segment_3']==1]
+rows_df_booster3 = len(df_booster3)
+
+
+
+
+
+# df_booster4 = df_global[(df_global['A_Segment_4'] == 1) & ~(df_global['Q24'].isna() | (df_global['Q24'] == '') )]
+df_booster4 = df_global[(df_global['A_Segment_4'] == 1) & ~(df_global['Q24']== -1)]
+rows_df_booster4 = len(df_booster4)
+
+
+
+
+
+df_random_qual_b2=df_global[(df_global['Q1_1'] == 1) & (df_global['Q21'].isin(core_brands_code))]
+rows_df_random_qual_b2= len(df_random_qual_b2)
+
+
+
+
+df_random_qual_b3=df_global[(df_global['Q1_1'] == 1) & (df_global['Q6_Autocode']==2)  & (df_global['Duration_Smoking'].isin([2,3,4,5])) & (df_global['Q22_AutoFill'].isin([2,3,4,5]))  & (df_global['Q11_2_Autofill'].isin([2,3])) & (df_global['Q23_Auto_Code'].isin([1,2,3]))]
+rows_df_random_qual_b3= len(df_random_qual_b3)
+
+
+
+
+# df_random_qual_b4=df_global[(df_global['Q1_1'] == 1) & (df_global['Q6_Autocode'].isin([2,3,4,5,6,7])) & (df_global['Duration_Smoking'].isin([5,6,7,8])) & (df_global['Q22_AutoFill'].isin([2,3,4,5])) & (df_global['Q11_2_Autofill']==3) & (df_global['Q23_Auto_Code'].isin([2,3])) & (df_global['Q21'].isin(core_brands_code))  & ~(df_global['Q24'].isna() | (df_global['Q24'] == '') ) ]
+df_random_qual_b4=df_global[(df_global['Q1_1'] == 1) & (df_global['Q6_Autocode'].isin([2,3,4,5,6,7])) & (df_global['Duration_Smoking'].isin([5,6,7,8])) & (df_global['Q22_AutoFill'].isin([2,3,4,5])) & (df_global['Q11_2_Autofill']==3) & (df_global['Q23_Auto_Code'].isin([2,3])) & (df_global['Q21'].isin(core_brands_code))   & ~(df_global['Q24']== -1) ]
+rows_df_random_qual_b4= len(df_random_qual_b4)
+
+
+# df_booster2.to_csv(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\Coochb2_BHSerror.csv')
+
+# df_random_qual_b2.to_csv(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\Coochrqb2_BHSerror.csv')
+
+
+total_rows_random = len(df_random)
+total_rows_Rqb2b2 = rows_df_booster2 + rows_df_random_qual_b2
+total_rows_Rqb3b3 = rows_df_booster3 + rows_df_random_qual_b3
+total_rows_Rqb4b4 = rows_df_booster4 + rows_df_random_qual_b4
+
+
+print(f"Total number of rows: {total_rows_random}")
+
+print(f"Total number of rows: {total_rows_Rqb2b2}")
+
+print(f"Total number of rows: {total_rows_Rqb3b3}")
+
+print(f"Total number of rows: {total_rows_Rqb4b4}")
+
