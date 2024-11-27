@@ -1,0 +1,47 @@
+from openpyxl import Workbook
+from openpyxl import load_workbook
+import pandas as pd
+import numpy as np
+from openpyxl.styles import Alignment
+from openpyxl.styles import PatternFill
+import matplotlib.pyplot as plt
+
+
+
+
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\45.BHS.xlsx'
+# input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Analysis Plan\Data\Brand Health Study 2_(n1727).xlsx'
+input_sheet = 'Sheet1'
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Error\45_deletedID_C3excluded_BHSerror.xlsx'
+df = pd.read_excel(input_file,input_sheet)
+
+
+
+input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v5 19 Nov 2024.xlsx'
+input_sheet1 = 'Sheet1'
+df_todelete=pd.read_excel(input_file1,input_sheet1)
+
+df = df[~df['SbjNum'].isin(df_todelete['SbjNum'])]
+
+
+
+input_file2 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\C3 Data to be deleted.xlsx'
+input_sheet2 = 'Sheet1'
+df_C3todelete=pd.read_excel(input_file2,input_sheet2)
+
+
+
+
+columns_to_modify = [f'T_C3_{i}' for i in range(1,8)]
+rows_to_modify = df_C3todelete['SbjNum']
+
+
+df.loc[df['SbjNum'].isin(rows_to_modify), columns_to_modify] = np.nan
+
+df.to_excel(output_path)
+
+
+
+
+
+
