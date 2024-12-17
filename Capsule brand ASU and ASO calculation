@@ -1,0 +1,443 @@
+from openpyxl import Workbook
+from openpyxl import load_workbook
+import pandas as pd
+import numpy as np
+from openpyxl.styles import Alignment
+
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\45_deletedID_C3excluded_BHSerror.xlsx'
+input_sheet = 'Sheet1'
+df = pd.read_excel(input_file,input_sheet)
+# output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Analysis\Malda_ASU25.xlsx'
+
+
+input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v5 19 Nov 2024.xlsx'
+input_sheet1 = 'Sheet1'
+
+
+df_todelete=pd.read_excel(input_file1,input_sheet1)
+
+# entries_to_exclude = ['test', 'trr','demo','test']
+# df = df[~df['Interviewer'].isin(entries_to_exclude)]
+
+
+# ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099,211264913,211264914,211352357,211352361,211248632,211249351,211249871,211250697,211251488,211252071,211252974,211253928,211254778,211256072,211306473,211306474,211354188,211354189,211354190,211354191,211354192,211411349,211411350,211411351,211411352,211411353,211411354]
+# df = df[~df['SbjNum'].isin(ID_to_exclude)]
+df = df[~df['SbjNum'].isin(df_todelete['SbjNum'])]
+
+
+df=df[df['Q2'] == 3]
+# df=df[df['Q1_1']==1]
+
+
+
+# for random ASU25
+# df=df[(df['Q1_1'] == 1) & (df['Q6_Autocode']==2)]
+
+
+
+
+# # # for random ASO25
+df=df[(df['Q1_1'] == 1) & (df['Q6_Autocode'].isin([3,4,5,6,7]))]
+
+
+
+
+desired_brands="American Club - len 84 -Rs 120/10 pc,Editions Trio - len 92 -Rs 160/16 pc,Focus Mint  - len 64,Gold Flake Indie Mint - len 69 -Rs 100/10 pc,Gold Flake Special Mint - len 64,Navy Cut Fruit - len 69,Stellar Cool Blast  - len 69,Total Refresh - len 69 -Rs 60/10 pc,Total Royal Twist - len 69 -Rs 60/10 pc,Total Spearmint - len 69 -Rs 60/10 pc,Wave Cool Mint - len 69 -Rs 60/10 pc,American Club Mint - len 84,American Club Smash - len 84 -Rs 120/10 Pc,American Fruit - len 84 -Rs 130/10 Pc,Classic Connect - len 97 -Rs 300/20 Pc,Classic Ice Burst - len 84 -Rs 170/10 Pc,Editions Active Mint - len 84 -Rs 120/10 Pc,Editions Ice Fruit - len 84 -Rs 100/10 Pc,Editions Spark - len 84 -Rs 120/10 Pc,Flake Mint Switch - len 69 -Rs 69/10 Pc,Gold Flake Kings - MixPOD - len 84 -Rs 170/10 Pc,Marlboro Clove - len 84 -Rs 170/10 Pc,Marlboro Fuse Beyond - len 84,Player\'s Mint - len 69,Scissors Menthol  - len 69,Stellar Slims Shift - len 97 -Rs 200/20 Pc,Total Active Mint - len 64,Wave Fruity - len 69 -Rs 60/10 Pc,Wave Mint - len 69,American Club Clove Magik - len 84 - Rs 140/10 Pc,Classic Double Burst - len 84 - Rs 340/20 Pc,Stellar Define Pan - len 97 - Rs 200/20 Pc,Stellar Shift Duos - len 97 - Rs 240/20 Pc"
+
+list_for_brandname = desired_brands.split(',')  
+# Remove leading and trailing spaces from each item
+list_for_brandname = [item.strip() for item in list_for_brandname]
+
+
+list_for_brandcode=[1,7,9,13,15,21,34,36,37,38,39,42,43,44,55,56,59,60,61,64,70,75,76,84,86,89,90,91,92,95,97,99,100]
+
+
+
+# df=df[df['A_Segment_3']==1]
+
+
+
+
+
+
+
+
+
+
+
+
+# Count1: Tom  
+
+
+# Error_n = ['Count1 :Tom']
+# df_name= pd.DataFrame(Error_n) 
+# existing_df = pd.read_excel(output_path)
+# startrow = existing_df.shape[0] + 4
+# with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+#     df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+
+
+Tom_total = df_global[df_global['Q14'].isin(list_for_brandcode)]
+
+
+
+total_TOM = len(Tom_total)
+# total_rows_Rqb2b2 = rows_df_booster2 + rows_df_random_qual_b2
+# total_rows_Rqb3b3 = rows_df_booster3 + rows_df_random_qual_b3
+# total_rows_Rqb4b4 = rows_df_booster4 + rows_df_random_qual_b4
+
+
+print(f"Total number of TOM: {total_TOM}")
+
+
+
+# Count 2 = TOM + Spont brand count
+
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','BrandcolumnQ14')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+
+mask = (df_global[list_for_brandname] == 1).any(axis=1)
+
+filtered_df = df_global[(mask) | (df_global['Q14'].isin(list_for_brandcode))]
+
+
+TOMSPONT_len = len(filtered_df)
+
+
+print(f"Total number of TOMSPONT: {TOMSPONT_len}")
+
+
+
+
+
+
+
+# Count 3 = Total Awareness brand count
+
+
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Brandtotalaware')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+
+mask = (df_global[list_for_brandname] == 1).any(axis=1)
+
+
+filtered_df = df_global[(mask)]
+
+
+Awarenesscapsule_len = len(filtered_df)
+
+
+print(f"Total number of Capsule reponse in Totalawareness: {Awarenesscapsule_len}")
+
+
+
+
+
+
+
+
+
+# Ever SMoked
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Brandeversmoke(Q16)')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+
+mask = (df_global[list_for_brandname] == 1).any(axis=1)
+
+
+filtered_df = df_global[(mask)]
+
+
+Evercapsule_len = len(filtered_df)
+
+
+print(f"Total number of Capsule reponse in ever smoked: {Evercapsule_len}")
+
+
+
+
+
+#  Last 1 year smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q18')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+mask = (df_global[list_for_brandname] == 1).any(axis=1)
+
+
+filtered_df = df_global[(mask)]
+
+
+L1Ycapsule_len = len(filtered_df)
+
+
+print(f"Total number of Capsule reponse in last 1 year smoked: {L1Ycapsule_len}")
+
+
+
+
+
+#Last 1 month smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q19')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+
+mask = (df_global[list_for_brandname] == 1).any(axis=1)
+
+
+filtered_df = df_global[(mask)]
+
+
+L1Mcapsule_len = len(filtered_df)
+
+
+print(f"Total number of Capsule reponse in last 1 month smoked: {L1Mcapsule_len}")
+
+
+
+
+
+
+
+
+
+# Last 2 week smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q20.1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+
+mask = (df_global[list_for_brandname] == 1).any(axis=1)
+
+
+filtered_df = df_global[(mask)]
+
+
+L2Wcapsule_len = len(filtered_df)
+
+
+print(f"Total number of Capsule reponse in last 2 week smoked: {L2Wcapsule_len}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# MOUB
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+
+
+Tom_total = df_global[df_global['Q21'].isin(list_for_brandcode)]
+
+
+
+total_MOUBcapsule = len(Tom_total)
+# total_rows_Rqb2b2 = rows_df_booster2 + rows_df_random_qual_b2
+# total_rows_Rqb3b3 = rows_df_booster3 + rows_df_random_qual_b3
+# total_rows_Rqb4b4 = rows_df_booster4 + rows_df_random_qual_b4
+
+
+print(f"Total number of capsule MOUB: {total_MOUBcapsule}")
+
+
+
+
+
+
+
+
+# Alternate brand
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+
+Tom_total = df_global[df_global['Q25_1'].isin(list_for_brandcode)]
+
+
+
+total_alternatecapsule = len(Tom_total)
+# total_rows_Rqb2b2 = rows_df_booster2 + rows_df_random_qual_b2
+# total_rows_Rqb3b3 = rows_df_booster3 + rows_df_random_qual_b3
+# total_rows_Rqb4b4 = rows_df_booster4 + rows_df_random_qual_b4
+
+
+print(f"Total number of capsule alternate: {total_alternatecapsule}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Count Considered brand 
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q25 consider brand ')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+
+mask = (df_global[list_for_brandname] == 1).any(axis=1)
+
+filtered_df = df_global[(mask) | (df_global['Q25_1'].isin(list_for_brandcode))]
+
+
+Capsuleconsidered_len = len(filtered_df)
+
+
+print(f"Total number of capsule considered brand: {Capsuleconsidered_len}")
+
+
+
+
+
+
