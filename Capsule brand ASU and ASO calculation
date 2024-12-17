@@ -1,0 +1,784 @@
+from openpyxl import Workbook
+from openpyxl import load_workbook
+import pandas as pd
+import numpy as np
+from openpyxl.styles import Alignment
+
+input_file = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\45_deletedID_C3excluded_BHSerror.xlsx'
+input_sheet = 'Sheet1'
+df = pd.read_excel(input_file,input_sheet)
+output_path = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Python output\Analysis\Malda_ASU25.xlsx'
+
+
+input_file1 = r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\Cancelled ID\Cancelled IDs - v5 19 Nov 2024.xlsx'
+input_sheet1 = 'Sheet1'
+
+
+df_todelete=pd.read_excel(input_file1,input_sheet1)
+
+# entries_to_exclude = ['test', 'trr','demo','test']
+# df = df[~df['Interviewer'].isin(entries_to_exclude)]
+
+
+# ID_to_exclude = [210777004,210844981,211205743,210845893,211167584,211167602,211168044,211168049,211198899,211144726,211231256,211249825,211251795,211253025,210838938,210839088,210841644,210843453,210844810,210846789,210850696,210904706,210906670,210907729,210908512,210909983,210911099,211264913,211264914,211352357,211352361,211248632,211249351,211249871,211250697,211251488,211252071,211252974,211253928,211254778,211256072,211306473,211306474,211354188,211354189,211354190,211354191,211354192,211411349,211411350,211411351,211411352,211411353,211411354]
+# df = df[~df['SbjNum'].isin(ID_to_exclude)]
+df = df[~df['SbjNum'].isin(df_todelete['SbjNum'])]
+
+
+df=df[df['Q2'] == 1]
+
+
+# for random ASU25
+df=df[(df['Q1_1'] == 1) & (df['Q6_Autocode']==2)]
+
+
+
+
+# # for random ASO25
+# df=df[(df['Q1_1'] == 1) & (df['Q6_Autocode'].isin([3,4,5,6,7]))]
+
+
+
+# df=df[df['A_Segment_3']==1]
+
+
+
+
+
+
+
+
+# Writing Error index in dataframe
+
+# Error_n = ['Count1: Zone Quota ']
+# df_name= pd.DataFrame(Error_n) 
+# df_name.to_excel(output_path, index=False, header=False)
+
+
+# Step 1: Create a list of topic names
+topics = ['Table1 :Combined table of Counts for total awareness and Total usage','Table2:Shifting from previous to current regular brand','Table 3 : Count:Age wise brands','Table4 : Count:SEC wise brands','Table5 :Count:Price quoted for MOUB']
+
+
+df_name = pd.DataFrame(topics, columns=['Logic list'])
+df_name.to_excel(output_path, index=False)
+
+
+
+
+def inside_append_dataframe_with_blank_rows(file_path, dataframe, blank_rows=2):
+    """
+    Appends a DataFrame to an existing Excel file with a specified number of blank rows in between.
+
+    Parameters:
+    - file_path: str, path to the Excel file
+    - dataframe: pd.DataFrame, DataFrame to append
+    - blank_rows: int, number of blank rows between appended DataFrames (default is 5)
+    """
+    
+    with pd.ExcelWriter(
+            file_path,
+            engine='openpyxl',
+            mode='a',
+            if_sheet_exists='overlay') as writer:
+        reader = pd.read_excel(file_path)
+        dataframe.to_excel(
+            writer,
+            startrow=reader.shape[0] + blank_rows,
+            index=True,
+            header=True)
+
+   
+        
+    workbook = load_workbook(file_path)
+    worksheet = workbook.active
+
+    # Center-align the text in the appended DataFrame
+    for row in worksheet.iter_rows(min_row=startrow + 1, max_row=startrow + len(dataframe) + 5, min_col=1, max_col=len(dataframe.columns) + 1):
+        for cell in row:
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    # Save the workbook
+    workbook.save(file_path)     
+
+
+
+
+
+
+
+def outside_append_dataframe_with_blank_rows(file_path, dataframe, blank_rows=5):
+    """
+    Appends a DataFrame to an existing Excel file with a specified number of blank rows in between.
+
+    Parameters:
+    - file_path: str, path to the Excel file
+    - dataframe: pd.DataFrame, DataFrame to append
+    - blank_rows: int, number of blank rows between appended DataFrames (default is 5)
+    """
+    
+    with pd.ExcelWriter(
+            file_path,
+            engine='openpyxl',
+            mode='a',
+            if_sheet_exists='overlay') as writer:
+        reader = pd.read_excel(file_path)
+        dataframe.to_excel(
+            writer,
+            startrow=reader.shape[0] + blank_rows,
+            index=True,
+            header=True)
+
+
+
+
+
+
+
+
+
+
+
+# Count1: Tom  
+
+
+# Error_n = ['Count1 :Tom']
+# df_name= pd.DataFrame(Error_n) 
+# existing_df = pd.read_excel(output_path)
+# startrow = existing_df.shape[0] + 4
+# with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+#     df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+
+
+
+
+df_s = df_global['Q14'].value_counts()
+
+
+Valuecount1=pd.DataFrame(df_s)
+# total_sum = Valuecount1.sum()
+# total_sum.name = 'Total_sum'
+# Valuecount1=Valuecount1._append(total_sum)
+
+
+
+
+Valuecount1.index = Valuecount1.index.to_series().replace(dict_format)
+
+
+
+
+
+
+
+
+# Count 2 = Spont brand count
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','BrandcolumnQ14')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount2=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Count 3 = Unaided awareness
+
+
+
+
+
+
+
+
+
+Valuecount3 = pd.concat([Valuecount1, Valuecount2], axis=1)
+Valuecount3.columns = ['TOM', 'Spont']
+Valuecount3['Tom+spont/Unaided awareness']=Valuecount3.sum(min_count=1,axis=1)
+
+
+
+
+
+
+# Count 4 = Aided Awareness brand count
+
+
+
+
+
+
+df_global=df.copy()
+
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Brand15')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount4=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+# Count 5 = Total Awareness
+
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Brandtotalaware')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount5=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+# Count 6 = Ever smoked brand count
+
+
+
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Brandeversmoke(Q16)')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount6=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+
+
+
+# Count 7 = Last 2 year smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Brand(Q17)')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount7=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+# Count 8 = Last 1 year smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q18')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount8=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Count 9 = Last 1 month smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q19')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount9=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+
+# Count 10 = Last 2 week smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q20.1')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount10=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+
+
+
+# Count 11 = Last 1 week smoked brand count
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q20')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount11=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+
+
+# Count 12 = MOUB
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+
+
+
+
+df_s = df_global['Q21'].value_counts()
+
+
+Valuecount12=pd.DataFrame(df_s)
+# total_sum = Valuecount1.sum()
+# total_sum.name = 'Total_sum'
+# Valuecount1=Valuecount1._append(total_sum)
+
+
+
+
+Valuecount12.index = Valuecount12.index.to_series().replace(dict_format)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Count 13 = Alternate brand
+
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','MOUB')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+
+
+
+
+
+df_s = df_global['Q25_1'].value_counts()
+
+
+Valuecount13=pd.DataFrame(df_s)
+# total_sum = Valuecount1.sum()
+# total_sum.name = 'Total_sum'
+# Valuecount1=Valuecount1._append(total_sum)
+
+
+
+
+Valuecount13.index = Valuecount13.index.to_series().replace(dict_format)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Count 14 = Consideration brand 
+
+
+
+df_global=df.copy()
+df_global.reset_index(drop=True, inplace=True)
+
+
+
+df_dictformation = pd.read_excel(r'D:\Input\Cigarette\Brand Health Study(October 2024)\Input\Data input\BHS 22-Oct-24_DataMap.xlsx','Q25 consider brand ')
+
+
+
+# Join two columns into a dictionary
+# Assuming 'Column1' and 'Column2' are the names of the columns you want to join
+dict_format = dict(zip(df_dictformation['Column'], df_dictformation['Brand']))
+df_global.rename(columns=dict_format, inplace=True)
+
+renamed_columns = list(dict_format.values())
+
+# Adding a new column 'Row_Sum' that contains the sum of each row across the renamed columns
+sum_of_columns= df_global[renamed_columns].sum()
+
+
+
+
+Valuecount14=pd.DataFrame(sum_of_columns)
+
+
+
+
+
+
+# Count 15 = Considered brand total
+
+
+
+
+
+
+
+
+
+Valuecount15 = pd.concat([Valuecount13, Valuecount14], axis=1)
+Valuecount15.columns = ['alternate brand (Q25.1)', 'Consider brand (Q25)']
+Valuecount15['Sum considered brand']=Valuecount15.sum(min_count=1,axis=1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Concat
+
+
+Error_n = [' Table1 :Combined table of Counts for total awareness and Total usage']
+df_name= pd.DataFrame(Error_n) 
+existing_df = pd.read_excel(output_path)
+startrow = existing_df.shape[0] + 4
+with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    df_name.to_excel(writer, startrow=startrow, index=False, header=False)
+
+
+
+
+resultant = pd.concat([Valuecount3,Valuecount4,Valuecount5,Valuecount6,Valuecount7,Valuecount8,Valuecount9,Valuecount10,Valuecount11,Valuecount12,Valuecount15], axis=1)
+resultant.columns = ['TOM', 'Spont', 'Tom+spont/Unaided awareness','Aided awareness','Total Awareness','Ever smoked','Last 2 year smoked','Last 1 year smoked', 'Last 1 month smoked', 'Last 2 weeks smoked','Last 1 weeks smoked','Regularly smoking','alternate brand (Q25.1)','Consider brand (Q25)','Sum considered brand' ]
+
+total_sum = resultant.sum()
+total_sum.name = 'Total_sum'
+resultant=resultant._append(total_sum)
+
+
+
+
+
+
+
+
+desired_brands="American Club - len 84 -Rs 120/10 pc,Editions Trio - len 92 -Rs 160/16 pc,Focus Mint  - len 64,Gold Flake Indie Mint - len 69 -Rs 100/10 pc,Gold Flake Special Mint - len 64,Navy Cut Fruit - len 69,Stellar Cool Blast  - len 69,Total Refresh - len 69 -Rs 60/10 pc,Total Royal Twist - len 69 -Rs 60/10 pc,Total Spearmint - len 69 -Rs 60/10 pc,Wave Cool Mint - len 69 -Rs 60/10 pc,American Club Mint - len 84,American Club Smash - len 84 -Rs 120/10 Pc,American Fruit - len 84 -Rs 130/10 Pc,Classic Connect - len 97 -Rs 300/20 Pc,Classic Ice Burst - len 84 -Rs 170/10 Pc,Editions Active Mint - len 84 -Rs 120/10 Pc,Editions Ice Fruit - len 84 -Rs 100/10 Pc,Editions Spark - len 84 -Rs 120/10 Pc,Flake Mint Switch - len 69 -Rs 69/10 Pc,Gold Flake Kings - MixPOD - len 84 -Rs 170/10 Pc,Marlboro Clove - len 84 -Rs 170/10 Pc,Marlboro Fuse Beyond - len 84,Player\'s Mint - len 69,Scissors Menthol  - len 69,Stellar Slims Shift - len 97 -Rs 200/20 Pc,Total Active Mint - len 64,Wave Fruity - len 69 -Rs 60/10 Pc,Wave Mint - len 69,American Club Clove Magik - len 84 - Rs 140/10 Pc,Classic Double Burst - len 84 - Rs 340/20 Pc,Stellar Define Pan - len 97 - Rs 200/20 Pc,Stellar Shift Duos - len 97 - Rs 240/20 Pc"
+
+input_string2 = desired_brands.split(',')  
+# Remove leading and trailing spaces from each item
+input_string2 = [item.strip() for item in input_string2]
+
+resultant=resultant.loc[input_string2]
+
+
+
+
+inside_append_dataframe_with_blank_rows(output_path, resultant)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
